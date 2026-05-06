@@ -3,6 +3,7 @@
 import PersonList from '@/presentation/components/PersonList';
 import ItemList from '@/presentation/components/ItemList';
 import ChargesList from '@/presentation/components/ChargesList';
+import DiscountsList from '@/presentation/components/DiscountsList';
 import SplitSummary from '@/presentation/components/SplitSummary';
 
 import { useDispatch } from 'react-redux';
@@ -25,6 +26,7 @@ export default function Home() {
         <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
           <PersonList />
           <ChargesList />
+          <DiscountsList />
         </div>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>

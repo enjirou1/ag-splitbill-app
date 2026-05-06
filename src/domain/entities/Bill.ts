@@ -18,6 +18,15 @@ export interface ExtraCharge {
   type: 'percentage' | 'fixed';
 }
 
+export interface Discount {
+  id: string;
+  name: string;
+  type: 'percentage' | 'fixed';
+  value: number;
+  minPurchase?: number;
+  maxDiscount?: number;
+}
+
 export interface Bill {
   id: string;
   items: BillItem[];
@@ -25,6 +34,7 @@ export interface Bill {
   tax: number; // percentage
   serviceCharge: number; // percentage
   extraCharges: ExtraCharge[];
+  discounts: Discount[];
 }
 
 export interface SplitResult {
@@ -39,5 +49,6 @@ export interface SplitResult {
   taxAmount: number;
   serviceChargeAmount: number;
   extraChargesAmount: number;
+  discountAmount: number;
   total: number;
 }

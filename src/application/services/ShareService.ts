@@ -19,6 +19,10 @@ export class ShareService {
     if (result.extraChargesAmount > 0) {
       text += `Extra Charges: Rp ${result.extraChargesAmount.toLocaleString()}\n`;
     }
+
+    if (result.discountAmount > 0) {
+      text += `Discounts: -Rp ${Math.floor(result.discountAmount).toLocaleString()}\n`;
+    }
     
     text += `--------------------------\n`;
     text += `*Total to Pay: Rp ${result.total.toLocaleString()}*\n\n`;
@@ -35,10 +39,12 @@ export class ShareService {
       if (charge.type === 'percentage') return acc + (subtotal * charge.value) / 100;
       return acc + charge.value;
     }, 0);
-    const grandTotal = subtotal + taxAmount + serviceChargeAmount + extraChargesAmount;
+    const totalDiscount = results.reduce((acc, res) => acc + res.discountAmount, 0);
+    const grandTotal = subtotal + taxAmount + serviceChargeAmount + extraChargesAmount - totalDiscount;
 
     let text = `*Enjirou Split Bill Summary*\n`;
     text += `Grand Total: Rp ${grandTotal.toLocaleString()}\n`;
+    if (totalDiscount > 0) text += `Total Discounts: -Rp ${totalDiscount.toLocaleString()}\n`;
     text += `--------------------------\n\n`;
     
     results.forEach(res => {

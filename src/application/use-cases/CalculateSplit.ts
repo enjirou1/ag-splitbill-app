@@ -13,6 +13,7 @@ export const calculateSplit = (bill: Bill): SplitResult[] => {
       taxAmount: 0,
       serviceChargeAmount: 0,
       extraChargesAmount: 0,
+      discountAmount: 0,
       total: 0,
     };
   });
@@ -39,10 +40,28 @@ export const calculateSplit = (bill: Bill): SplitResult[] => {
 
   const totalSubtotal = Object.values(results).reduce((acc, curr) => acc + curr.subtotal, 0);
 
-  // Apply tax, service charge, and extra charges proportionally
+  // Calculate total discounts
+  let totalDiscountAmount = 0;
+  bill.discounts.forEach(discount => {
+    if (!discount.minPurchase || totalSubtotal >= discount.minPurchase) {
+      let amount = 0;
+      if (discount.type === 'fixed') {
+        amount = discount.value;
+      } else {
+        amount = (totalSubtotal * discount.value) / 100;
+        if (discount.maxDiscount) {
+          amount = Math.min(amount, discount.maxDiscount);
+        }
+      }
+      totalDiscountAmount += amount;
+    }
+  });
+
+  // Apply tax, service charge, extra charges, and discounts proportionally
   Object.values(results).forEach((res) => {
     const ratio = totalSubtotal > 0 ? res.subtotal / totalSubtotal : 0;
 
+    res.discountAmount = totalDiscountAmount * ratio;
     res.taxAmount = (res.subtotal * bill.tax) / 100;
     res.serviceChargeAmount = (res.subtotal * bill.serviceCharge) / 100;
     
@@ -54,7 +73,7 @@ export const calculateSplit = (bill: Bill): SplitResult[] => {
       }
     }, 0);
 
-    res.total = Math.ceil(res.subtotal + res.taxAmount + res.serviceChargeAmount + res.extraChargesAmount);
+    res.total = Math.ceil(res.subtotal - res.discountAmount + res.taxAmount + res.serviceChargeAmount + res.extraChargesAmount);
   });
 
   return Object.values(results);

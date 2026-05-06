@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { Bill, BillItem, Person, ExtraCharge } from '@/domain/entities/Bill';
+import { Bill, BillItem, Person, ExtraCharge, Discount } from '@/domain/entities/Bill';
 
 interface BillState extends Bill {
   loading: boolean;
@@ -13,6 +13,7 @@ const initialState: BillState = {
   tax: 0,
   serviceCharge: 0,
   extraCharges: [],
+  discounts: [],
   loading: false,
   error: null,
 };
@@ -56,6 +57,13 @@ const billSlice = createSlice({
     removeExtraCharge: (state, action: PayloadAction<string>) => {
       state.extraCharges = state.extraCharges.filter(c => c.id !== action.payload);
     },
+    addDiscount: (state, action: PayloadAction<Omit<Discount, 'id'>>) => {
+      const newDiscount = { ...action.payload, id: Math.random().toString(36).substr(2, 9) };
+      state.discounts.push(newDiscount);
+    },
+    removeDiscount: (state, action: PayloadAction<string>) => {
+      state.discounts = state.discounts.filter(d => d.id !== action.payload);
+    },
     resetBill: (state) => {
       return initialState;
     },
@@ -78,6 +86,7 @@ export const {
   addPerson, removePerson, 
   updateTax, updateServiceCharge, 
   addExtraCharge, removeExtraCharge,
+  addDiscount, removeDiscount,
   resetBill, setItems, addItems
 } = billSlice.actions;
 

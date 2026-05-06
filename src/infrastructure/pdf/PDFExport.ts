@@ -41,13 +41,13 @@ export const exportToPDF = (bill: Bill, results: SplitResult[], filename: string
   pdf.setFont('courier', 'normal');
   pdf.setFontSize(7);
   bill.items.forEach((item) => {
-    const name = item.name.length > 20 ? item.name.substring(0, 17) + '...' : item.name;
+    const nameLines = pdf.splitTextToSize(item.name, 45);
     const priceInfo = `${item.quantity}x ${item.price.toLocaleString()}`;
     const total = (item.price * item.quantity).toLocaleString();
     
-    pdf.text(name, margin, y);
+    pdf.text(nameLines, margin, y);
     pdf.text(total, width - margin, y, { align: 'right' });
-    y += 4;
+    y += (nameLines.length * 4);
     pdf.text(priceInfo, margin + 2, y);
     y += 5;
 
@@ -68,13 +68,16 @@ export const exportToPDF = (bill: Bill, results: SplitResult[], filename: string
     if (charge.type === 'percentage') return acc + (subtotal * charge.value) / 100;
     return acc + charge.value;
   }, 0);
-  const grandTotal = subtotal + taxAmount + serviceChargeAmount + extraChargesAmount;
+
+  const totalDiscount = results.reduce((acc, res) => acc + res.discountAmount, 0);
+  const grandTotal = subtotal + taxAmount + serviceChargeAmount + extraChargesAmount - totalDiscount;
 
   const drawRow = (label: string, value: string, isBold: boolean = false) => {
     pdf.setFont('helvetica', isBold ? 'bold' : 'normal');
-    pdf.text(label, margin, y);
+    const labelLines = pdf.splitTextToSize(label, 45);
+    pdf.text(labelLines, margin, y);
     pdf.text(value, width - margin, y, { align: 'right' });
-    y += 5;
+    y += Math.max(labelLines.length * 4, 5);
   };
 
   drawRow('Subtotal:', subtotal.toLocaleString());
@@ -85,6 +88,19 @@ export const exportToPDF = (bill: Bill, results: SplitResult[], filename: string
     const label = charge.name + (charge.type === 'percentage' ? ` (${charge.value}%):` : ':');
     const val = (charge.type === 'percentage' ? (subtotal * charge.value) / 100 : charge.value).toLocaleString();
     drawRow(label, val);
+  });
+
+  bill.discounts.forEach(discount => {
+    if (!discount.minPurchase || subtotal >= discount.minPurchase) {
+      let amount = 0;
+      if (discount.type === 'fixed') {
+        amount = discount.value;
+      } else {
+        amount = (subtotal * discount.value) / 100;
+        if (discount.maxDiscount) amount = Math.min(amount, discount.maxDiscount);
+      }
+      drawRow(`Discount (${discount.name}):`, `- ${amount.toLocaleString()}`);
+    }
   });
 
   line('=');
@@ -108,15 +124,22 @@ export const exportToPDF = (bill: Bill, results: SplitResult[], filename: string
 
     pdf.setFont('helvetica', 'italic');
     res.items.forEach(item => {
-      pdf.text(`- ${item.name}`, margin + 2, y);
+      const nameLines = pdf.splitTextToSize(`- ${item.name}`, 45);
+      pdf.text(nameLines, margin + 2, y);
       pdf.text(item.splitPrice.toLocaleString(), width - margin - 2, y, { align: 'right' });
-      y += 4;
+      y += (nameLines.length * 4);
     });
 
     const otherCharges = res.taxAmount + res.serviceChargeAmount + res.extraChargesAmount;
     if (otherCharges > 0) {
       pdf.text(`- Taxes & Extra`, margin + 2, y);
       pdf.text(otherCharges.toLocaleString(), width - margin - 2, y, { align: 'right' });
+      y += 4;
+    }
+
+    if (res.discountAmount > 0) {
+      pdf.text(`- Discounts`, margin + 2, y);
+      pdf.text(`- ${Math.floor(res.discountAmount).toLocaleString()}`, width - margin - 2, y, { align: 'right' });
       y += 4;
     }
     
