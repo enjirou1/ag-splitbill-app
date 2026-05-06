@@ -77,6 +77,26 @@ const billSlice = createSlice({
         assignedTo: []
       }));
       state.items.push(...newItems);
+    },
+    autofillBill: (state, action: PayloadAction<{
+      items: Omit<BillItem, 'id' | 'assignedTo'>[],
+      tax?: number,
+      serviceCharge?: number,
+      discounts?: Omit<Discount, 'id'>[]
+    }>) => {
+      state.items = action.payload.items.map(item => ({
+        ...item,
+        id: Math.random().toString(36).substr(2, 9),
+        assignedTo: []
+      }));
+      if (action.payload.tax !== undefined) state.tax = action.payload.tax;
+      if (action.payload.serviceCharge !== undefined) state.serviceCharge = action.payload.serviceCharge;
+      if (action.payload.discounts !== undefined) {
+        state.discounts = action.payload.discounts.map(d => ({
+          ...d,
+          id: Math.random().toString(36).substr(2, 9)
+        }));
+      }
     }
   },
 });
@@ -87,7 +107,7 @@ export const {
   updateTax, updateServiceCharge, 
   addExtraCharge, removeExtraCharge,
   addDiscount, removeDiscount,
-  resetBill, setItems, addItems
+  resetBill, setItems, addItems, autofillBill
 } = billSlice.actions;
 
 export default billSlice.reducer;

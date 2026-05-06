@@ -23,7 +23,7 @@ export default function SplitSummary() {
 
   const totalDiscount = results.reduce((acc, res) => acc + res.discountAmount, 0);
 
-  const grandTotal = subtotal + taxAmount + serviceChargeAmount + extraChargesAmount - totalDiscount;
+  const grandTotal = Math.round(subtotal + taxAmount + serviceChargeAmount + extraChargesAmount - totalDiscount);
 
   return (
     <div className="card" id="pdf-content">
@@ -127,7 +127,7 @@ export default function SplitSummary() {
                   </div>
                   <div className="flex-between" style={{ fontSize: '0.8125rem', color: 'var(--text-muted)', marginBottom: '0.25rem' }}>
                     <span>Tax & Service Charge</span>
-                    <span>Rp {(res.taxAmount + res.serviceChargeAmount).toLocaleString()}</span>
+                    <span>Rp {Math.round(res.taxAmount + res.serviceChargeAmount).toLocaleString()}</span>
                   </div>
                   {res.discountAmount > 0 && (
                     <div className="flex-between" style={{ fontSize: '0.8125rem', color: 'var(--danger)', marginBottom: '0.25rem' }}>

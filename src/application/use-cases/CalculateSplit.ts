@@ -62,14 +62,14 @@ export const calculateSplit = (bill: Bill): SplitResult[] => {
     const ratio = totalSubtotal > 0 ? res.subtotal / totalSubtotal : 0;
 
     res.discountAmount = totalDiscountAmount * ratio;
-    res.taxAmount = (res.subtotal * bill.tax) / 100;
-    res.serviceChargeAmount = (res.subtotal * bill.serviceCharge) / 100;
+    res.taxAmount = Math.round((res.subtotal * bill.tax) / 100);
+    res.serviceChargeAmount = Math.round((res.subtotal * bill.serviceCharge) / 100);
     
     res.extraChargesAmount = bill.extraCharges.reduce((acc, charge) => {
       if (charge.type === 'percentage') {
-        return acc + (res.subtotal * charge.value) / 100;
+        return acc + Math.round((res.subtotal * charge.value) / 100);
       } else {
-        return acc + charge.value * ratio;
+        return acc + Math.round(charge.value * ratio);
       }
     }, 0);
 

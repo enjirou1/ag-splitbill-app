@@ -5,6 +5,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../store';
 import { addItem, updateItem, removeItem } from '../store/billSlice';
 import { ShoppingBag, Plus, Trash2, CheckCircle2, User } from 'lucide-react';
+import AutofillButton from './AutofillButton';
 
 export default function ItemList() {
   const [name, setName] = useState('');
@@ -42,7 +43,10 @@ export default function ItemList() {
 
   return (
     <div className="card">
-      <h2 className="section-title"><ShoppingBag size={24} /> Items</h2>
+      <div className="flex-between" style={{ marginBottom: '1.5rem' }}>
+        <h2 className="section-title" style={{ marginBottom: 0 }}><ShoppingBag size={24} /> Items</h2>
+        <AutofillButton />
+      </div>
       
       <div style={{ 
         display: 'flex', 
