@@ -133,7 +133,7 @@ export default function ItemList() {
             border: '1px dashed var(--border-color)'
           }}>
             <ShoppingBag size={40} style={{ opacity: 0.1, marginBottom: '1rem' }} />
-            <p style={{ color: 'var(--text-muted)' }}>No items yet. Add manually or use OCR.</p>
+            <p style={{ color: 'var(--text-muted)' }}>No items yet.</p>
           </div>
         )}
       </div>

@@ -15,9 +15,9 @@ export default function Home() {
   return (
     <main className="container">
       <header style={{ marginBottom: '4rem', textAlign: 'center' }}>
-        <h1 className="title" style={{ marginBottom: '0.5rem' }}>Split Bill Pro</h1>
+        <h1 className="title" style={{ marginBottom: '0.5rem' }}>Enjirou Split Bill</h1>
         <p style={{ color: 'var(--text-muted)', fontSize: '1.1rem', fontWeight: 500 }}>
-          The elegant way to share expenses with friends.
+          Fair and fast bill splitting for everyone
         </p>
       </header>
 
@@ -40,8 +40,7 @@ export default function Home() {
       </div>
 
       <footer style={{ marginTop: '5rem', padding: '2rem 0', textAlign: 'center', borderTop: '1px solid var(--border-color)', color: 'var(--text-muted)', fontSize: '0.875rem' }}>
-        <p>© 2026 Split Bill Pro • Built with Next.js & Clean Architecture</p>
-        <p style={{ marginTop: '0.5rem', opacity: 0.7 }}>Powered by Gemini AI for OCR</p>
+        <p>© 2026 Enjirou Split Bill</p>
       </footer>
     </main>
   );

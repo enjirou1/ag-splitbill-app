@@ -246,6 +246,23 @@ input:focus {
   to { opacity: 1; transform: translateY(0); }
 }
 
+
+/* Share Button Hover Effect */
+.share-btn-hover {
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.share-btn-hover:hover {
+  transform: scale(1.15);
+  background: rgba(59, 130, 246, 0.2) !important;
+  color: var(--primary-hover) !important;
+}
+
+.share-btn-hover:active {
+  transform: scale(0.95);
+}
+
 /* Responsive Customizations */
 @media (max-width: 768px) {
   .container { padding: 1.5rem 1rem; }

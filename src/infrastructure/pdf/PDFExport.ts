@@ -23,7 +23,7 @@ export const exportToPDF = (bill: Bill, results: SplitResult[], filename: string
   // Header
   pdf.setFont('helvetica', 'bold');
   pdf.setFontSize(14);
-  pdf.text('SPLIT BILL PRO', width / 2, y, { align: 'center' });
+  pdf.text('ENJIROU SPLIT BILL', width / 2, y, { align: 'center' });
   y += 6;
   
   pdf.setFontSize(8);
@@ -131,7 +131,7 @@ export const exportToPDF = (bill: Bill, results: SplitResult[], filename: string
 
   y += 5;
   pdf.setFont('helvetica', 'normal');
-  pdf.text('Thank you for using Split Bill Pro!', width / 2, y, { align: 'center' });
+  pdf.text('Thank you for using Enjirou Split Bill!', width / 2, y, { align: 'center' });
   
   pdf.save(filename);
 };

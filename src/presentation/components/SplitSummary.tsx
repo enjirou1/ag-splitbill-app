@@ -4,7 +4,8 @@ import { useSelector } from 'react-redux';
 import { RootState } from '../store';
 import { calculateSplit } from '@/application/use-cases/CalculateSplit';
 import { exportToPDF } from '@/infrastructure/pdf/PDFExport';
-import { FileDown, Calculator, ChevronDown, ChevronUp } from 'lucide-react';
+import { FileDown, Calculator, ChevronDown, ChevronUp, Share2, Send } from 'lucide-react';
+import { ShareService } from '@/application/services/ShareService';
 import { useState } from 'react';
 
 export default function SplitSummary() {
@@ -26,9 +27,14 @@ export default function SplitSummary() {
     <div className="card" id="pdf-content">
       <div className="flex-between" style={{ marginBottom: '2rem' }}>
         <h2 className="section-title"><Calculator size={24} /> Split Summary</h2>
-        <button className="btn-secondary" onClick={() => exportToPDF(bill, results, `receipt-${new Date().getTime()}.pdf`)}>
-          <FileDown size={18} /> Export Receipt
-        </button>
+        <div className="flex" style={{ gap: '0.5rem' }}>
+          <button className="btn-secondary" onClick={() => ShareService.share('Split Bill Summary', ShareService.formatGlobalSummary(bill, results))}>
+            <Share2 size={18} /> Share
+          </button>
+          <button className="btn-secondary" onClick={() => exportToPDF(bill, results, `receipt-${new Date().getTime()}.pdf`)}>
+            <FileDown size={18} /> Export
+          </button>
+        </div>
       </div>
 
       <div style={{
@@ -71,10 +77,32 @@ export default function SplitSummary() {
                 <span style={{ fontWeight: '700', fontSize: '1.1rem', color: '#334155' }}>{res.personName}</span>
                 <p style={{ fontSize: '0.8125rem', color: 'var(--text-muted)' }}>{res.items.length} items selected</p>
               </div>
-              <div className="flex" style={{ gap: '1.25rem' }}>
-                <span style={{ fontWeight: '800', fontSize: '1.1rem', color: 'var(--primary)' }}>Rp {res.total.toLocaleString()}</span>
-                <div style={{ color: 'var(--text-muted)' }}>
-                  {expanded === res.personId ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+              <div className="flex" style={{ gap: '1rem' }}>
+                <div 
+                  style={{ 
+                    color: 'var(--primary)', 
+                    padding: '0.5rem', 
+                    borderRadius: '50%', 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    justifyContent: 'center',
+                    background: 'rgba(59, 130, 246, 0.1)',
+                    transition: 'all 0.2s ease'
+                  }}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    ShareService.share(`Split for ${res.personName}`, ShareService.formatPersonSummary(res));
+                  }}
+                  title="Share breakdown"
+                  className="share-btn-hover"
+                >
+                  <Send size={16} />
+                </div>
+                <div className="flex" style={{ gap: '1.25rem' }}>
+                  <span style={{ fontWeight: '800', fontSize: '1.1rem', color: 'var(--primary)' }}>Rp {res.total.toLocaleString()}</span>
+                  <div style={{ color: 'var(--text-muted)' }}>
+                    {expanded === res.personId ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+                  </div>
                 </div>
               </div>
             </div>
