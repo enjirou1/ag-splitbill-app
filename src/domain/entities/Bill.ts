@@ -29,6 +29,7 @@ export interface Discount {
 
 export interface Bill {
   id: string;
+  shopName?: string;
   items: BillItem[];
   people: Person[];
   tax: number; // percentage
@@ -40,6 +41,7 @@ export interface Bill {
 export interface SplitResult {
   personId: string;
   personName: string;
+  shopName?: string;
   items: {
     name: string;
     originalPrice: number;

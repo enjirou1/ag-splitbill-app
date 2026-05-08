@@ -3,8 +3,8 @@
 import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../store';
-import { addPerson, removePerson } from '../store/billSlice';
-import { UserPlus, UserMinus, User, Shuffle } from 'lucide-react';
+import { addPerson, removePerson, updatePerson } from '../store/billSlice';
+import { UserPlus, UserMinus, User, Shuffle, Save } from 'lucide-react';
 
 export default function PersonList() {
   const [name, setName] = useState('');
@@ -22,6 +22,21 @@ export default function PersonList() {
     const randomNames = ['Budi', 'Ani', 'Caca', 'Dedi', 'Euis', 'Fandi'];
     const randomName = randomNames[Math.floor(Math.random() * randomNames.length)] + ' ' + Math.floor(Math.random() * 100);
     dispatch(addPerson(randomName));
+  };
+
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editName, setEditName] = useState('');
+
+  const handleStartEdit = (person: { id: string, name: string }) => {
+    setEditingId(person.id);
+    setEditName(person.name);
+  };
+
+  const handleSaveEdit = () => {
+    if (editingId && editName.trim()) {
+      dispatch(updatePerson({ id: editingId, name: editName.trim() }));
+      setEditingId(null);
+    }
   };
 
   return (
@@ -52,7 +67,51 @@ export default function PersonList() {
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.75rem' }}>
         {people.map((person) => (
           <div key={person.id} className="person-tag selected">
-            <span style={{ fontWeight: 600 }}>{person.name}</span>
+            {editingId === person.id ? (
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <input
+                  autoFocus
+                  className="edit-input-inline"
+                  value={editName}
+                  onChange={(e) => setEditName(e.target.value)}
+                  onKeyPress={(e) => e.key === 'Enter' && handleSaveEdit()}
+                  style={{
+                    background: 'transparent',
+                    border: 'none',
+                    color: 'white',
+                    fontWeight: 600,
+                    width: `${Math.max(editName.length, 4)}ch`,
+                    padding: 0,
+                    margin: 0,
+                    outline: 'none'
+                  }}
+                />
+                <button 
+                  onClick={handleSaveEdit}
+                  style={{ 
+                    background: 'rgba(255,255,255,0.3)', 
+                    border: 'none', 
+                    color: 'white', 
+                    borderRadius: '50%', 
+                    width: '28px', 
+                    height: '28px', 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    justifyContent: 'center',
+                    cursor: 'pointer'
+                  }}
+                >
+                  <Save size={16} />
+                </button>
+              </div>
+            ) : (
+              <span 
+                style={{ fontWeight: 600, cursor: 'pointer' }} 
+                onClick={() => handleStartEdit(person)}
+              >
+                {person.name}
+              </span>
+            )}
             <div 
               onClick={() => dispatch(removePerson(person.id))}
               style={{ 

@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../store';
 import { addItem, updateItem, removeItem } from '../store/billSlice';
-import { ShoppingBag, Plus, Trash2, CheckCircle2, User } from 'lucide-react';
+import { ShoppingBag, Plus, Trash2, CheckCircle2, User, Save } from 'lucide-react';
 import AutofillButton from './AutofillButton';
 
 export default function ItemList() {
@@ -39,6 +39,34 @@ export default function ItemList() {
       : [...item.assignedTo, personId];
 
     dispatch(updateItem({ ...item, assignedTo }));
+  };
+
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editFields, setEditFields] = useState<{name: string, price: string, qty: string} | null>(null);
+
+  const handleStartEdit = (item: any) => {
+    setEditingId(item.id);
+    setEditFields({
+      name: item.name,
+      price: item.price.toString(),
+      qty: item.quantity.toString()
+    });
+  };
+
+  const handleSaveEdit = () => {
+    if (editingId && editFields) {
+      const item = items.find(i => i.id === editingId);
+      if (item) {
+        dispatch(updateItem({
+          ...item,
+          name: editFields.name,
+          price: parseFloat(editFields.price) || 0,
+          quantity: parseInt(editFields.qty) || 1
+        }));
+      }
+      setEditingId(null);
+      setEditFields(null);
+    }
   };
 
   return (
@@ -84,14 +112,58 @@ export default function ItemList() {
         {items.map((item) => (
           <div key={item.id} className="item-row">
             <div className="flex-between" style={{ marginBottom: '0.75rem' }}>
-              <div>
-                <span style={{ fontWeight: 700, fontSize: '1.1rem', color: '#1e293b' }}>{item.name}</span>
-                <span className="badge" style={{ marginLeft: '12px', background: '#eff6ff', color: '#3b82f6' }}>x{item.quantity}</span>
+              <div style={{ flex: 1 }}>
+                {editingId === item.id ? (
+                  <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                    <input 
+                      autoFocus
+                      value={editFields?.name} 
+                      onChange={(e) => setEditFields(prev => prev ? {...prev, name: e.target.value} : null)}
+                      onKeyPress={(e) => e.key === 'Enter' && handleSaveEdit()}
+                      style={{ fontSize: '1rem', padding: '4px 8px', width: '150px' }}
+                    />
+                    <span style={{ fontSize: '0.9rem', color: 'var(--text-muted)' }}>x</span>
+                    <input 
+                      type="number"
+                      value={editFields?.qty} 
+                      onChange={(e) => setEditFields(prev => prev ? {...prev, qty: e.target.value} : null)}
+                      onKeyPress={(e) => e.key === 'Enter' && handleSaveEdit()}
+                      style={{ fontSize: '1rem', padding: '4px 8px', width: '65px' }}
+                    />
+                  </div>
+                ) : (
+                  <div onClick={() => handleStartEdit(item)} style={{ cursor: 'pointer' }}>
+                    <span style={{ fontWeight: 700, fontSize: '1.1rem', color: '#1e293b' }}>{item.name}</span>
+                    <span className="badge" style={{ marginLeft: '12px', background: '#eff6ff', color: '#3b82f6' }}>x{item.quantity}</span>
+                  </div>
+                )}
               </div>
               <div className="flex" style={{ gap: '1rem' }}>
-                <span style={{ fontWeight: 800, fontSize: '1.1rem', color: 'var(--primary)' }}>
-                  Rp {(item.price * item.quantity).toLocaleString()}
-                </span>
+                {editingId === item.id ? (
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                      <span style={{ fontWeight: 800, color: 'var(--primary)' }}>Rp</span>
+                      <input 
+                        type="number"
+                        value={editFields?.price} 
+                        onChange={(e) => setEditFields(prev => prev ? {...prev, price: e.target.value} : null)}
+                        onKeyPress={(e) => e.key === 'Enter' && handleSaveEdit()}
+                        style={{ fontSize: '1.1rem', fontWeight: 800, padding: '4px 8px', width: '100px', textAlign: 'right', color: 'var(--primary)' }}
+                      />
+                    </div>
+                    <button 
+                      className="btn-primary btn-icon" 
+                      onClick={handleSaveEdit} 
+                      style={{ width: '40px', height: '40px', borderRadius: '50%' }}
+                    >
+                      <Save size={20} />
+                    </button>
+                  </div>
+                ) : (
+                  <span onClick={() => handleStartEdit(item)} style={{ fontWeight: 800, fontSize: '1.1rem', color: 'var(--primary)', cursor: 'pointer' }}>
+                    Rp {(item.price * item.quantity).toLocaleString()}
+                  </span>
+                )}
                 <div 
                   onClick={() => dispatch(removeItem(item.id))}
                   style={{ 

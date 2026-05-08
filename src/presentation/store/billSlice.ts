@@ -2,8 +2,10 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { Bill, BillItem, Person, ExtraCharge, Discount } from '@/domain/entities/Bill';
 
 interface BillState extends Bill {
+  shopName: string;
   loading: boolean;
   error: string | null;
+  persistenceType: 'local' | 'session' | 'none';
 }
 
 const initialState: BillState = {
@@ -14,14 +16,19 @@ const initialState: BillState = {
   serviceCharge: 0,
   extraCharges: [],
   discounts: [],
+  shopName: '',
   loading: false,
   error: null,
+  persistenceType: 'local',
 };
 
 const billSlice = createSlice({
   name: 'bill',
   initialState,
   reducers: {
+    updateShopName: (state, action: PayloadAction<string>) => {
+      state.shopName = action.payload;
+    },
     addItem: (state, action: PayloadAction<Omit<BillItem, 'id'>>) => {
       const newItem = { ...action.payload, id: Math.random().toString(36).substr(2, 9) };
       state.items.push(newItem);
@@ -44,6 +51,10 @@ const billSlice = createSlice({
         item.assignedTo = item.assignedTo.filter(id => id !== action.payload);
       });
     },
+    updatePerson: (state, action: PayloadAction<Person>) => {
+      const index = state.people.findIndex(p => p.id === action.payload.id);
+      if (index !== -1) state.people[index] = action.payload;
+    },
     updateTax: (state, action: PayloadAction<number>) => {
       state.tax = action.payload;
     },
@@ -57,12 +68,20 @@ const billSlice = createSlice({
     removeExtraCharge: (state, action: PayloadAction<string>) => {
       state.extraCharges = state.extraCharges.filter(c => c.id !== action.payload);
     },
+    updateExtraCharge: (state, action: PayloadAction<ExtraCharge>) => {
+      const index = state.extraCharges.findIndex(c => c.id === action.payload.id);
+      if (index !== -1) state.extraCharges[index] = action.payload;
+    },
     addDiscount: (state, action: PayloadAction<Omit<Discount, 'id'>>) => {
       const newDiscount = { ...action.payload, id: Math.random().toString(36).substr(2, 9) };
       state.discounts.push(newDiscount);
     },
     removeDiscount: (state, action: PayloadAction<string>) => {
       state.discounts = state.discounts.filter(d => d.id !== action.payload);
+    },
+    updateDiscount: (state, action: PayloadAction<Discount>) => {
+      const index = state.discounts.findIndex(d => d.id === action.payload.id);
+      if (index !== -1) state.discounts[index] = action.payload;
     },
     resetBill: (state) => {
       return initialState;
@@ -97,17 +116,25 @@ const billSlice = createSlice({
           id: Math.random().toString(36).substr(2, 9)
         }));
       }
+    },
+    setPersistenceType: (state, action: PayloadAction<BillState['persistenceType']>) => {
+      state.persistenceType = action.payload;
+    },
+    hydrate: (state, action: PayloadAction<Partial<BillState>>) => {
+      return { ...state, ...action.payload };
     }
   },
 });
 
-export const { 
-  addItem, updateItem, removeItem, 
-  addPerson, removePerson, 
-  updateTax, updateServiceCharge, 
-  addExtraCharge, removeExtraCharge,
-  addDiscount, removeDiscount,
-  resetBill, setItems, addItems, autofillBill
+export const {
+  addItem, updateItem, removeItem,
+  addPerson, removePerson, updatePerson,
+  updateTax, updateServiceCharge,
+  addExtraCharge, removeExtraCharge, updateExtraCharge,
+  addDiscount, removeDiscount, updateDiscount,
+  updateShopName,
+  resetBill, setItems, addItems, autofillBill,
+  hydrate
 } = billSlice.actions;
 
 export default billSlice.reducer;

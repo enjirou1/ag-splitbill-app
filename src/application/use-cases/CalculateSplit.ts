@@ -8,6 +8,7 @@ export const calculateSplit = (bill: Bill): SplitResult[] => {
     results[person.id] = {
       personId: person.id,
       personName: person.name,
+      shopName: bill.shopName,
       items: [],
       subtotal: 0,
       taxAmount: 0,

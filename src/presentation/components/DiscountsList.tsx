@@ -2,8 +2,8 @@
 
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../store';
-import { addDiscount, removeDiscount } from '../store/billSlice';
-import { Tag, Plus, Trash2, Info } from 'lucide-react';
+import { addDiscount, removeDiscount, updateDiscount } from '../store/billSlice';
+import { Tag, Plus, Trash2, Info, Check, Save } from 'lucide-react';
 import { useState } from 'react';
 
 export default function DiscountsList() {
@@ -15,6 +15,41 @@ export default function DiscountsList() {
   const [type, setType] = useState<'percentage' | 'fixed'>('fixed');
   const [minPurchase, setMinPurchase] = useState('');
   const [maxDiscount, setMaxDiscount] = useState('');
+
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editFields, setEditFields] = useState<{
+    name: string, 
+    value: string, 
+    type: 'percentage' | 'fixed',
+    minPurchase?: string,
+    maxDiscount?: string
+  } | null>(null);
+
+  const handleStartEdit = (discount: any) => {
+    setEditingId(discount.id);
+    setEditFields({
+      name: discount.name,
+      value: discount.value.toString(),
+      type: discount.type,
+      minPurchase: discount.minPurchase?.toString() || '',
+      maxDiscount: discount.maxDiscount?.toString() || ''
+    });
+  };
+
+  const handleSaveEdit = () => {
+    if (editingId && editFields) {
+      dispatch(updateDiscount({
+        id: editingId,
+        name: editFields.name,
+        value: parseFloat(editFields.value) || 0,
+        type: editFields.type,
+        minPurchase: editFields.minPurchase ? parseFloat(editFields.minPurchase) : undefined,
+        maxDiscount: editFields.maxDiscount ? parseFloat(editFields.maxDiscount) : undefined,
+      }));
+      setEditingId(null);
+      setEditFields(null);
+    }
+  };
 
   const handleAddDiscount = () => {
     if (name.trim() && value) {
@@ -82,30 +117,80 @@ export default function DiscountsList() {
         ) : (
           bill.discounts.map(discount => (
             <div key={discount.id} className="flex-between" style={{ padding: '1rem', background: 'white', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)', position: 'relative' }}>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
-                <span style={{ fontWeight: 700, color: '#334155' }}>{discount.name}</span>
-                <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
-                  <span className="badge">
-                    {discount.type === 'percentage' ? `${discount.value}%` : `Rp ${discount.value.toLocaleString()}`}
-                  </span>
-                  {discount.minPurchase && (
-                    <span className="badge" style={{ background: '#ecfdf5', color: '#059669' }}>
-                      Min: Rp {discount.minPurchase.toLocaleString()}
-                    </span>
-                  )}
-                  {discount.maxDiscount && (
-                    <span className="badge" style={{ background: '#fff7ed', color: '#ea580c' }}>
-                      Max: Rp {discount.maxDiscount.toLocaleString()}
-                    </span>
-                  )}
+              {editingId === discount.id ? (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', width: '100%' }}>
+                  <div style={{ display: 'flex', gap: '0.5rem' }}>
+                    <input 
+                      autoFocus
+                      value={editFields?.name} 
+                      onChange={(e) => setEditFields(prev => prev ? {...prev, name: e.target.value} : null)}
+                      placeholder="Name"
+                      style={{ flex: 1 }}
+                    />
+                    <input 
+                      type="number"
+                      value={editFields?.value} 
+                      onChange={(e) => setEditFields(prev => prev ? {...prev, value: e.target.value} : null)}
+                      placeholder="Val"
+                      style={{ width: '80px' }}
+                    />
+                    <select 
+                      value={editFields?.type} 
+                      onChange={(e) => setEditFields(prev => prev ? {...prev, type: e.target.value as any} : null)}
+                      style={{ width: '100px' }}
+                    >
+                      <option value="fixed">Rp</option>
+                      <option value="percentage">%</option>
+                    </select>
+                  </div>
+                  <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                    <input 
+                      type="number"
+                      value={editFields?.minPurchase} 
+                      onChange={(e) => setEditFields(prev => prev ? {...prev, minPurchase: e.target.value} : null)}
+                      placeholder="Min Pur"
+                      style={{ flex: 1, fontSize: '0.8rem' }}
+                    />
+                    <input 
+                      type="number"
+                      value={editFields?.maxDiscount} 
+                      onChange={(e) => setEditFields(prev => prev ? {...prev, maxDiscount: e.target.value} : null)}
+                      placeholder="Max Disc"
+                      style={{ flex: 1, fontSize: '0.8rem' }}
+                    />
+                    <button className="btn-primary" onClick={handleSaveEdit} style={{ height: '40px', width: '40px', borderRadius: '50%' }}>
+                      <Save size={20} />
+                    </button>
+                  </div>
                 </div>
-              </div>
-              <div
-                onClick={() => dispatch(removeDiscount(discount.id))}
-                style={{ color: 'var(--danger)', cursor: 'pointer', padding: '0.5rem', borderRadius: '50%', background: '#fef2f2' }}
-              >
-                <Trash2 size={18} />
-              </div>
+              ) : (
+                <>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem', cursor: 'pointer' }} onClick={() => handleStartEdit(discount)}>
+                    <span style={{ fontWeight: 700, color: '#334155' }}>{discount.name}</span>
+                    <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                      <span className="badge">
+                        {discount.type === 'percentage' ? `${discount.value}%` : `Rp ${discount.value.toLocaleString()}`}
+                      </span>
+                      {discount.minPurchase && (
+                        <span className="badge" style={{ background: '#ecfdf5', color: '#059669' }}>
+                          Min: Rp {discount.minPurchase.toLocaleString()}
+                        </span>
+                      )}
+                      {discount.maxDiscount && (
+                        <span className="badge" style={{ background: '#fff7ed', color: '#ea580c' }}>
+                          Max: Rp {discount.maxDiscount.toLocaleString()}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                  <div
+                    onClick={() => dispatch(removeDiscount(discount.id))}
+                    style={{ color: 'var(--danger)', cursor: 'pointer', padding: '0.5rem', borderRadius: '50%', background: '#fef2f2' }}
+                  >
+                    <Trash2 size={18} />
+                  </div>
+                </>
+              )}
             </div>
           ))
         )}

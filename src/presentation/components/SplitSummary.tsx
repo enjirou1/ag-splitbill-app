@@ -25,6 +25,20 @@ export default function SplitSummary() {
 
   const grandTotal = Math.round(subtotal + taxAmount + serviceChargeAmount + extraChargesAmount - totalDiscount);
 
+  const handleExport = () => {
+    const now = new Date();
+    const d = now.getDate().toString().padStart(2, '0');
+    const m = (now.getMonth() + 1).toString().padStart(2, '0');
+    const y = now.getFullYear();
+
+    // Using dots/dashes for filename compatibility while keeping the requested look
+    const timestamp = `${d}-${m}-${y}`;
+    const shopPart = bill.shopName ? ` ${bill.shopName}` : '';
+    const filename = `Split Bill${shopPart} ${timestamp}.pdf`;
+
+    exportToPDF(bill, results, filename);
+  };
+
   return (
     <div className="card" id="pdf-content">
       <div className="flex-between" style={{ marginBottom: '2rem' }}>
@@ -33,7 +47,7 @@ export default function SplitSummary() {
           <button className="btn-secondary" style={{ flex: '1 1 auto' }} onClick={() => ShareService.share('Split Bill Summary', ShareService.formatGlobalSummary(bill, results))}>
             <Share2 size={18} /> <span className="hide-mobile">Share</span>
           </button>
-          <button className="btn-secondary" style={{ flex: '1 1 auto' }} onClick={() => exportToPDF(bill, results, `receipt-${new Date().getTime()}.pdf`)}>
+          <button className="btn-secondary" style={{ flex: '1 1 auto' }} onClick={handleExport}>
             <FileDown size={18} /> <span className="hide-mobile">Export</span>
           </button>
         </div>
@@ -80,13 +94,13 @@ export default function SplitSummary() {
                 <p style={{ fontSize: '0.8125rem', color: 'var(--text-muted)' }}>{res.items.length} items selected</p>
               </div>
               <div className="flex" style={{ gap: '1rem' }}>
-                <div 
-                  style={{ 
-                    color: 'var(--primary)', 
-                    padding: '0.5rem', 
-                    borderRadius: '50%', 
-                    display: 'flex', 
-                    alignItems: 'center', 
+                <div
+                  style={{
+                    color: 'var(--primary)',
+                    padding: '0.5rem',
+                    borderRadius: '50%',
+                    display: 'flex',
+                    alignItems: 'center',
                     justifyContent: 'center',
                     background: 'rgba(59, 130, 246, 0.1)',
                     transition: 'all 0.2s ease'

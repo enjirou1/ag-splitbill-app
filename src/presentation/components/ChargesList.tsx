@@ -2,8 +2,8 @@
 
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../store';
-import { updateTax, updateServiceCharge, addExtraCharge, removeExtraCharge } from '../store/billSlice';
-import { Percent, Receipt, Plus, Trash2 } from 'lucide-react';
+import { updateTax, updateServiceCharge, addExtraCharge, removeExtraCharge, updateExtraCharge } from '../store/billSlice';
+import { Percent, Receipt, Plus, Trash2, CheckCircle2, Save } from 'lucide-react';
 import { useState } from 'react';
 
 export default function ChargesList() {
@@ -12,6 +12,31 @@ export default function ChargesList() {
   const [extraName, setExtraName] = useState('');
   const [extraValue, setExtraValue] = useState('');
   const [extraType, setExtraType] = useState<'percentage' | 'fixed'>('fixed');
+
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editFields, setEditFields] = useState<{name: string, value: string, type: 'percentage' | 'fixed'} | null>(null);
+
+  const handleStartEdit = (charge: any) => {
+    setEditingId(charge.id);
+    setEditFields({
+      name: charge.name,
+      value: charge.value.toString(),
+      type: charge.type
+    });
+  };
+
+  const handleSaveEdit = () => {
+    if (editingId && editFields) {
+      dispatch(updateExtraCharge({
+        id: editingId,
+        name: editFields.name,
+        value: parseFloat(editFields.value) || 0,
+        type: editFields.type
+      }));
+      setEditingId(null);
+      setEditFields(null);
+    }
+  };
 
   const handleAddExtra = () => {
     if (extraName.trim() && extraValue) {
@@ -91,18 +116,56 @@ export default function ChargesList() {
         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
           {bill.extraCharges.map(charge => (
             <div key={charge.id} className="flex-between" style={{ padding: '0.75rem 1rem', background: 'white', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-color)' }}>
-              <span style={{ fontWeight: 600 }}>{charge.name}</span>
-              <div className="flex">
-                <span style={{ fontWeight: 700, color: 'var(--primary)' }}>
-                  {charge.type === 'percentage' ? `${charge.value}%` : `Rp ${charge.value.toLocaleString()}`}
-                </span>
-                <div
-                  onClick={() => dispatch(removeExtraCharge(charge.id))}
-                  style={{ color: 'var(--danger)', cursor: 'pointer', display: 'flex', padding: '4px' }}
-                >
-                  <Trash2 size={16} />
+              {editingId === charge.id ? (
+                <div style={{ display: 'flex', gap: '0.5rem', flex: 1, marginRight: '1rem', alignItems: 'center' }}>
+                  <input 
+                    autoFocus
+                    value={editFields?.name} 
+                    onChange={(e) => setEditFields(prev => prev ? {...prev, name: e.target.value} : null)}
+                    onKeyPress={(e) => e.key === 'Enter' && handleSaveEdit()}
+                    style={{ flex: 1 }}
+                  />
+                  <input 
+                    type="number"
+                    value={editFields?.value} 
+                    onChange={(e) => setEditFields(prev => prev ? {...prev, value: e.target.value} : null)}
+                    onKeyPress={(e) => e.key === 'Enter' && handleSaveEdit()}
+                    style={{ width: '80px' }}
+                  />
+                  <select 
+                    value={editFields?.type} 
+                    onChange={(e) => setEditFields(prev => prev ? {...prev, type: e.target.value as any} : null)}
+                    style={{ width: '100px' }}
+                  >
+                    <option value="fixed">Rp</option>
+                    <option value="percentage">%</option>
+                  </select>
+                  <button 
+                    className="btn-primary btn-icon" 
+                    onClick={handleSaveEdit} 
+                    style={{ width: '36px', height: '36px', borderRadius: '50%' }}
+                  >
+                    <Save size={18} />
+                  </button>
                 </div>
-              </div>
+              ) : (
+                <>
+                  <span style={{ fontWeight: 600, cursor: 'pointer' }} onClick={() => handleStartEdit(charge)}>
+                    {charge.name}
+                  </span>
+                  <div className="flex">
+                    <span style={{ fontWeight: 700, color: 'var(--primary)', cursor: 'pointer' }} onClick={() => handleStartEdit(charge)}>
+                      {charge.type === 'percentage' ? `${charge.value}%` : `Rp ${charge.value.toLocaleString()}`}
+                    </span>
+                    <div
+                      onClick={() => dispatch(removeExtraCharge(charge.id))}
+                      style={{ color: 'var(--danger)', cursor: 'pointer', display: 'flex', padding: '4px' }}
+                    >
+                      <Trash2 size={16} />
+                    </div>
+                  </div>
+                </>
+              )}
             </div>
           ))}
         </div>

@@ -2,7 +2,8 @@ import { Bill, SplitResult } from "@/domain/entities/Bill";
 
 export class ShareService {
   static formatPersonSummary(result: SplitResult): string {
-    let text = `*Bill Summary for ${result.personName}*\n`;
+    let text = result.shopName ? `*${result.shopName}*\n` : '';
+    text += `*Bill Summary for ${result.personName}*\n`;
     text += `--------------------------\n`;
     
     result.items.forEach(item => {
@@ -42,7 +43,8 @@ export class ShareService {
     const totalDiscount = results.reduce((acc, res) => acc + res.discountAmount, 0);
     const grandTotal = subtotal + taxAmount + serviceChargeAmount + extraChargesAmount - totalDiscount;
 
-    let text = `*Enjirou Split Bill Summary*\n`;
+    let text = bill.shopName ? `*${bill.shopName}*\n` : '';
+    text += `*Enjirou Split Bill Summary*\n`;
     text += `Grand Total: Rp ${grandTotal.toLocaleString()}\n`;
     if (totalDiscount > 0) text += `Total Discounts: -Rp ${totalDiscount.toLocaleString()}\n`;
     text += `--------------------------\n\n`;

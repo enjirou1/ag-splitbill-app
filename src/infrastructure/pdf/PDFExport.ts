@@ -22,8 +22,8 @@ export const exportToPDF = (bill: Bill, results: SplitResult[], filename: string
 
   // Header
   pdf.setFont('helvetica', 'bold');
-  pdf.setFontSize(14);
-  pdf.text('ENJIROU SPLIT BILL', width / 2, y, { align: 'center' });
+  pdf.setFontSize(bill.shopName ? 16 : 14);
+  pdf.text(bill.shopName ? bill.shopName.toUpperCase() : 'ENJIROU SPLIT BILL', width / 2, y, { align: 'center' });
   y += 6;
   
   pdf.setFontSize(8);
