@@ -66,7 +66,8 @@ body {
   padding: 2rem;
   box-shadow: var(--shadow-md);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
-  height: 100%;
+  /* height: 100%; removed to allow content expansion */
+  /* overflow: hidden; removed to prevent clipping */
 }
 
 .card:hover {
@@ -75,7 +76,7 @@ body {
 }
 
 .title {
-  font-size: 3rem;
+  font-size: clamp(2rem, 8vw, 3.5rem); /* Responsive font size */
   font-weight: 800;
   letter-spacing: -0.025em;
   margin-bottom: 2rem;
@@ -83,6 +84,8 @@ body {
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+  line-height: 1.2;
+  word-break: break-word;
 }
 
 /* Buttons */
@@ -163,20 +166,33 @@ input:focus {
 
 .grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
   gap: 2rem;
+}
+
+@media (max-width: 400px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 .flex {
   display: flex;
   gap: 0.75rem;
   align-items: center;
+  flex-wrap: wrap; /* Essential for mobile */
+}
+
+.flex-nowrap {
+  flex-wrap: nowrap !important;
 }
 
 .flex-between {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
 }
 
 .section-title {
@@ -247,6 +263,16 @@ input:focus {
 }
 
 
+.hide-mobile {
+  display: inline;
+}
+
+@media (max-width: 480px) {
+  .hide-mobile { display: none; }
+  .summary-total-card { padding: 1rem !important; }
+  .summary-total-card h3 { font-size: 1.75rem !important; }
+}
+
 /* Share Button Hover Effect */
 .share-btn-hover {
   cursor: pointer;
@@ -268,5 +294,17 @@ input:focus {
   .container { padding: 1.5rem 1rem; }
   .title { font-size: 2.25rem; }
   .grid { grid-template-columns: 1fr; }
+  .card { padding: 1.25rem; }
+  .flex { gap: 0.5rem; }
+  
+  /* Ensure inputs and buttons don't push the card out */
+  input, select, button {
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .title { font-size: 1.75rem; }
+  .section-title { font-size: 1.25rem; }
 }
 

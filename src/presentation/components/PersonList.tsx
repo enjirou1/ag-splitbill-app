@@ -32,7 +32,7 @@ export default function PersonList() {
       </p>
       
       <div className="flex" style={{ marginBottom: '1.5rem' }}>
-        <div style={{ position: 'relative', flex: 1 }}>
+        <div style={{ position: 'relative', flex: '1 1 200px' }}>
           <input 
             type="text" 
             placeholder="Enter name..." 
@@ -41,10 +41,10 @@ export default function PersonList() {
             onKeyPress={(e) => e.key === 'Enter' && handleAdd()}
           />
         </div>
-        <button className="btn-primary" onClick={handleAdd} title="Add Person">
+        <button className="btn-primary btn-icon" onClick={handleAdd} title="Add Person">
           <UserPlus size={18} />
         </button>
-        <button className="btn-secondary" onClick={handleRandom} title="Quick Add Random">
+        <button className="btn-secondary btn-icon" onClick={handleRandom} title="Quick Add Random">
           <Shuffle size={18} />
         </button>
       </div>

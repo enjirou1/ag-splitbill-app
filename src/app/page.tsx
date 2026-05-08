@@ -25,12 +25,12 @@ export default function Home() {
       <div className="grid">
         <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
           <PersonList />
-          <ChargesList />
-          <DiscountsList />
+          <ItemList />
         </div>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
-          <ItemList />
+          <ChargesList />
+          <DiscountsList />
           <SplitSummary />
         </div>
       </div>

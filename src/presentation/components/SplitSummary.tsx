@@ -29,25 +29,25 @@ export default function SplitSummary() {
     <div className="card" id="pdf-content">
       <div className="flex-between" style={{ marginBottom: '2rem' }}>
         <h2 className="section-title"><Calculator size={24} /> Split Summary</h2>
-        <div className="flex" style={{ gap: '0.5rem' }}>
-          <button className="btn-secondary" onClick={() => ShareService.share('Split Bill Summary', ShareService.formatGlobalSummary(bill, results))}>
-            <Share2 size={18} /> Share
+        <div className="flex" style={{ gap: '0.5rem', flex: '1 1 auto', justifyContent: 'flex-end' }}>
+          <button className="btn-secondary" style={{ flex: '1 1 auto' }} onClick={() => ShareService.share('Split Bill Summary', ShareService.formatGlobalSummary(bill, results))}>
+            <Share2 size={18} /> <span className="hide-mobile">Share</span>
           </button>
-          <button className="btn-secondary" onClick={() => exportToPDF(bill, results, `receipt-${new Date().getTime()}.pdf`)}>
-            <FileDown size={18} /> Export
+          <button className="btn-secondary" style={{ flex: '1 1 auto' }} onClick={() => exportToPDF(bill, results, `receipt-${new Date().getTime()}.pdf`)}>
+            <FileDown size={18} /> <span className="hide-mobile">Export</span>
           </button>
         </div>
       </div>
 
       <div style={{
         background: 'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)',
-        padding: '2rem',
+        padding: '1.5rem',
         borderRadius: 'var(--radius-md)',
         marginBottom: '2rem',
         textAlign: 'center',
         border: '1px solid var(--border-color)',
         boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.02)'
-      }}>
+      }} className="summary-total-card">
         <p style={{ color: 'var(--text-muted)', fontSize: '0.8125rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '0.5rem' }}>
           Grand Total
         </p>

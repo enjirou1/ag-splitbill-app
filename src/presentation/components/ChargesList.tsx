@@ -34,30 +34,30 @@ export default function ChargesList() {
           <label style={{ fontSize: '0.8125rem', fontWeight: '700', color: 'var(--text-muted)', display: 'block', marginBottom: '0.5rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
             Tax
           </label>
-          <div className="flex" style={{ background: 'white', borderRadius: 'var(--radius-sm)', border: '2px solid #eef2ff', paddingRight: '0.75rem' }}>
+          <div className="flex flex-nowrap" style={{ background: 'white', borderRadius: 'var(--radius-sm)', border: '2px solid #eef2ff', paddingRight: '0.75rem' }}>
             <input
               type="number"
               value={bill.tax}
-              style={{ border: 'none', background: 'transparent' }}
+              style={{ border: 'none', background: 'transparent', flex: 1 }}
               onChange={(e) => dispatch(updateTax(parseFloat(e.target.value) || 0))}
               onFocus={(e) => e.target.select()}
             />
-            <Percent size={18} style={{ color: 'var(--primary)', opacity: 0.5 }} />
+            <Percent size={18} style={{ color: 'var(--primary)', opacity: 0.5, flexShrink: 0 }} />
           </div>
         </div>
         <div style={{ flex: '1 1 150px', background: '#f8fafc', padding: '1rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)' }}>
           <label style={{ fontSize: '0.8125rem', fontWeight: '700', color: 'var(--text-muted)', display: 'block', marginBottom: '0.5rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
             Service Charge
           </label>
-          <div className="flex" style={{ background: 'white', borderRadius: 'var(--radius-sm)', border: '2px solid #eef2ff', paddingRight: '0.75rem' }}>
+          <div className="flex flex-nowrap" style={{ background: 'white', borderRadius: 'var(--radius-sm)', border: '2px solid #eef2ff', paddingRight: '0.75rem' }}>
             <input
               type="number"
               value={bill.serviceCharge}
-              style={{ border: 'none', background: 'transparent' }}
+              style={{ border: 'none', background: 'transparent', flex: 1 }}
               onChange={(e) => dispatch(updateServiceCharge(parseFloat(e.target.value) || 0))}
               onFocus={(e) => e.target.select()}
             />
-            <Percent size={18} style={{ color: 'var(--primary)', opacity: 0.5 }} />
+            <Percent size={18} style={{ color: 'var(--primary)', opacity: 0.5, flexShrink: 0 }} />
           </div>
         </div>
       </div>
