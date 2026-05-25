@@ -27,7 +27,7 @@ export class ShareService {
     
     text += `--------------------------\n`;
     text += `*Total to Pay: Rp ${result.total.toLocaleString()}*\n\n`;
-    text += `Shared via Enjirou Split Bill`;
+    text += `Shared via Enwari`;
     
     return text;
   }
@@ -44,7 +44,7 @@ export class ShareService {
     const grandTotal = subtotal + taxAmount + serviceChargeAmount + extraChargesAmount - totalDiscount;
 
     let text = bill.shopName ? `*${bill.shopName}*\n` : '';
-    text += `*Enjirou Split Bill Summary*\n`;
+    text += `*Enwari Summary*\n`;
     text += `Grand Total: Rp ${grandTotal.toLocaleString()}\n`;
     if (totalDiscount > 0) text += `Total Discounts: -Rp ${totalDiscount.toLocaleString()}\n`;
     text += `--------------------------\n\n`;
@@ -54,7 +54,7 @@ export class ShareService {
     });
     
     text += `\n--------------------------\n`;
-    text += `Shared via Enjirou Split Bill`;
+    text += `Shared via Enwari`;
     
     return text;
   }

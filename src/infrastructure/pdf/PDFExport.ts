@@ -23,7 +23,7 @@ export const exportToPDF = (bill: Bill, results: SplitResult[], filename: string
   // Header
   pdf.setFont('helvetica', 'bold');
   pdf.setFontSize(bill.shopName ? 16 : 14);
-  pdf.text(bill.shopName ? bill.shopName.toUpperCase() : 'ENJIROU SPLIT BILL', width / 2, y, { align: 'center' });
+  pdf.text(bill.shopName ? bill.shopName.toUpperCase() : 'ENWARI', width / 2, y, { align: 'center' });
   y += 6;
   
   pdf.setFontSize(8);
@@ -154,7 +154,7 @@ export const exportToPDF = (bill: Bill, results: SplitResult[], filename: string
 
   y += 5;
   pdf.setFont('helvetica', 'normal');
-  pdf.text('Thank you for using Enjirou Split Bill!', width / 2, y, { align: 'center' });
+  pdf.text('Thank you for using Enwari!', width / 2, y, { align: 'center' });
   
   pdf.save(filename);
 };

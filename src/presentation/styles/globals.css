@@ -308,3 +308,8 @@ input:focus {
   .section-title { font-size: 1.25rem; }
 }
 
+/* Custom logo micro-interaction */
+.logo-img:hover {
+  transform: scale(1.05);
+}
+

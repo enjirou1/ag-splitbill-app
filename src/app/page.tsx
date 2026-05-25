@@ -27,11 +27,37 @@ export default function Home() {
 
   return (
     <main className="container">
-      <header style={{ marginBottom: '3rem', textAlign: 'center' }}>
-        <h1 className="title" style={{ marginBottom: '0.5rem' }}>Enjirou Split Bill</h1>
-        <p style={{ color: 'var(--text-muted)', fontSize: '1.1rem', fontWeight: 500, marginBottom: '2rem' }}>
-          Fair and fast bill splitting for everyone
-        </p>
+      <header style={{ marginBottom: '2.5rem', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+        <h1 style={{
+          position: 'absolute',
+          width: '1px',
+          height: '1px',
+          padding: 0,
+          margin: '-1px',
+          overflow: 'hidden',
+          clip: 'rect(0, 0, 0, 0)',
+          border: 0
+        }}>
+          Enwari
+        </h1>
+        <div style={{ 
+          display: 'flex', 
+          justifyContent: 'center', 
+          marginBottom: '1rem'
+        }}>
+          <img 
+            src="/logo.png" 
+            alt="Enwari Logo" 
+            style={{ 
+              height: '150px', 
+              objectFit: 'contain',
+              mixBlendMode: 'multiply',
+              filter: 'drop-shadow(0 4px 10px rgba(0,0,0,0.02))',
+              transition: 'transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)'
+            }}
+            className="logo-img"
+          />
+        </div>
 
         <div style={{ maxWidth: '400px', margin: '0 auto', position: 'relative' }}>
           <div style={{ 
@@ -85,7 +111,7 @@ export default function Home() {
       </div>
 
       <footer style={{ marginTop: '5rem', padding: '2rem 0', textAlign: 'center', borderTop: '1px solid var(--border-color)', color: 'var(--text-muted)', fontSize: '0.875rem' }}>
-        <p>© 2026 Enjirou Split Bill</p>
+        <p>© 2026 Enwari</p>
       </footer>
     </main>
   );

@@ -34,7 +34,7 @@ export default function SplitSummary() {
     // Using dots/dashes for filename compatibility while keeping the requested look
     const timestamp = `${d}-${m}-${y}`;
     const shopPart = bill.shopName ? ` ${bill.shopName}` : '';
-    const filename = `Split Bill${shopPart} ${timestamp}.pdf`;
+    const filename = `Enwari${shopPart} ${timestamp}.pdf`;
 
     exportToPDF(bill, results, filename);
   };
@@ -44,7 +44,7 @@ export default function SplitSummary() {
       <div className="flex-between" style={{ marginBottom: '2rem' }}>
         <h2 className="section-title"><Calculator size={24} /> Split Summary</h2>
         <div className="flex" style={{ gap: '0.5rem', flex: '1 1 auto', justifyContent: 'flex-end' }}>
-          <button className="btn-secondary" style={{ flex: '1 1 auto' }} onClick={() => ShareService.share('Split Bill Summary', ShareService.formatGlobalSummary(bill, results))}>
+          <button className="btn-secondary" style={{ flex: '1 1 auto' }} onClick={() => ShareService.share('Enwari Summary', ShareService.formatGlobalSummary(bill, results))}>
             <Share2 size={18} /> <span className="hide-mobile">Share</span>
           </button>
           <button className="btn-secondary" style={{ flex: '1 1 auto' }} onClick={handleExport}>
