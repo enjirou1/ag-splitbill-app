@@ -9,7 +9,7 @@ import { useState } from 'react';
 export default function DiscountsList() {
   const bill = useSelector((state: RootState) => state.bill);
   const dispatch = useDispatch();
-  
+
   const [name, setName] = useState('');
   const [value, setValue] = useState('');
   const [type, setType] = useState<'percentage' | 'fixed'>('fixed');
@@ -18,8 +18,8 @@ export default function DiscountsList() {
 
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editFields, setEditFields] = useState<{
-    name: string, 
-    value: string, 
+    name: string,
+    value: string,
     type: 'percentage' | 'fixed',
     minPurchase?: string,
     maxDiscount?: string
@@ -75,7 +75,7 @@ export default function DiscountsList() {
         <div className="flex" style={{ flexWrap: 'wrap' }}>
           <div style={{ flex: '2 1 150px' }}>
             <label className="input-label">Voucher Name</label>
-            <input type="text" placeholder="e.g. SHOPEE50" value={name} onChange={(e) => setName(e.target.value)} />
+            <input type="text" placeholder="e.g. COUPON 50%" value={name} onChange={(e) => setName(e.target.value)} />
           </div>
           <div style={{ flex: '1 1 100px' }}>
             <label className="input-label">Value</label>
@@ -120,23 +120,23 @@ export default function DiscountsList() {
               {editingId === discount.id ? (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', width: '100%' }}>
                   <div style={{ display: 'flex', gap: '0.5rem' }}>
-                    <input 
+                    <input
                       autoFocus
-                      value={editFields?.name} 
-                      onChange={(e) => setEditFields(prev => prev ? {...prev, name: e.target.value} : null)}
+                      value={editFields?.name}
+                      onChange={(e) => setEditFields(prev => prev ? { ...prev, name: e.target.value } : null)}
                       placeholder="Name"
                       style={{ flex: 1 }}
                     />
-                    <input 
+                    <input
                       type="number"
-                      value={editFields?.value} 
-                      onChange={(e) => setEditFields(prev => prev ? {...prev, value: e.target.value} : null)}
+                      value={editFields?.value}
+                      onChange={(e) => setEditFields(prev => prev ? { ...prev, value: e.target.value } : null)}
                       placeholder="Val"
                       style={{ width: '80px' }}
                     />
-                    <select 
-                      value={editFields?.type} 
-                      onChange={(e) => setEditFields(prev => prev ? {...prev, type: e.target.value as any} : null)}
+                    <select
+                      value={editFields?.type}
+                      onChange={(e) => setEditFields(prev => prev ? { ...prev, type: e.target.value as any } : null)}
                       style={{ width: '100px' }}
                     >
                       <option value="fixed">Rp</option>
@@ -144,17 +144,17 @@ export default function DiscountsList() {
                     </select>
                   </div>
                   <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
-                    <input 
+                    <input
                       type="number"
-                      value={editFields?.minPurchase} 
-                      onChange={(e) => setEditFields(prev => prev ? {...prev, minPurchase: e.target.value} : null)}
+                      value={editFields?.minPurchase}
+                      onChange={(e) => setEditFields(prev => prev ? { ...prev, minPurchase: e.target.value } : null)}
                       placeholder="Min Pur"
                       style={{ flex: 1, fontSize: '0.8rem' }}
                     />
-                    <input 
+                    <input
                       type="number"
-                      value={editFields?.maxDiscount} 
-                      onChange={(e) => setEditFields(prev => prev ? {...prev, maxDiscount: e.target.value} : null)}
+                      value={editFields?.maxDiscount}
+                      onChange={(e) => setEditFields(prev => prev ? { ...prev, maxDiscount: e.target.value } : null)}
                       placeholder="Max Disc"
                       style={{ flex: 1, fontSize: '0.8rem' }}
                     />

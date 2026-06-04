@@ -41,6 +41,24 @@ export default function ItemList() {
     dispatch(updateItem({ ...item, assignedTo }));
   };
 
+  const handleIncrement = (itemId: string, personId: string) => {
+    const item = items.find(i => i.id === itemId);
+    if (!item) return;
+    const assignedTo = [...item.assignedTo, personId];
+    dispatch(updateItem({ ...item, assignedTo }));
+  };
+
+  const handleDecrement = (itemId: string, personId: string) => {
+    const item = items.find(i => i.id === itemId);
+    if (!item) return;
+    const index = item.assignedTo.indexOf(personId);
+    if (index !== -1) {
+      const assignedTo = [...item.assignedTo];
+      assignedTo.splice(index, 1);
+      dispatch(updateItem({ ...item, assignedTo }));
+    }
+  };
+
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editFields, setEditFields] = useState<{name: string, price: string, qty: string} | null>(null);
 
@@ -134,7 +152,7 @@ export default function ItemList() {
                 ) : (
                   <div onClick={() => handleStartEdit(item)} style={{ cursor: 'pointer' }}>
                     <span style={{ fontWeight: 700, fontSize: '1.1rem', color: '#1e293b' }}>{item.name}</span>
-                    <span className="badge" style={{ marginLeft: '12px', background: '#eff6ff', color: '#3b82f6' }}>x{item.quantity}</span>
+                    <span className="badge" style={{ marginLeft: '12px', background: '#fdf2f8', color: '#db2777' }}>x{item.quantity}</span>
                   </div>
                 )}
               </div>
@@ -181,17 +199,90 @@ export default function ItemList() {
             </div>
             
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
-              {people.map(person => (
-                <div 
-                  key={person.id} 
-                  className={`person-tag ${item.assignedTo.includes(person.id) ? 'selected' : ''}`}
-                  style={{ cursor: 'pointer', fontSize: '0.75rem' }}
-                  onClick={() => toggleAssignment(item.id, person.id)}
-                >
-                  {item.assignedTo.includes(person.id) ? <CheckCircle2 size={12} /> : <User size={12} />}
-                  {person.name}
-                </div>
-              ))}
+              {people.map(person => {
+                const personCount = item.assignedTo.filter(id => id === person.id).length;
+                const isSelected = personCount > 0;
+                return (
+                  <div 
+                    key={person.id} 
+                    className={`person-tag ${isSelected ? 'selected' : ''}`}
+                    style={{ 
+                      fontSize: '0.75rem', 
+                      display: 'inline-flex', 
+                      alignItems: 'center',
+                      paddingRight: isSelected ? '6px' : undefined,
+                      userSelect: 'none'
+                    }}
+                  >
+                    <div 
+                      style={{ display: 'flex', alignItems: 'center', gap: '0.375rem', cursor: 'pointer' }}
+                      onClick={() => toggleAssignment(item.id, person.id)}
+                    >
+                      {isSelected ? <CheckCircle2 size={12} /> : <User size={12} />}
+                      <span>{person.name}</span>
+                      {personCount > 1 && (
+                        <span style={{ 
+                          fontSize: '0.7rem', 
+                          fontWeight: 800, 
+                          background: 'rgba(255, 255, 255, 0.25)', 
+                          color: 'white', 
+                          padding: '1px 5px', 
+                          borderRadius: '4px',
+                          marginLeft: '2px'
+                        }}>
+                          x{personCount}
+                        </span>
+                      )}
+                    </div>
+                    {isSelected && (
+                      <div style={{ display: 'flex', gap: '2px', alignItems: 'center', marginLeft: '6px' }}>
+                        <button 
+                          onClick={(e) => { e.stopPropagation(); handleDecrement(item.id, person.id); }}
+                          style={{
+                            width: '18px',
+                            height: '18px',
+                            borderRadius: '50%',
+                            border: 'none',
+                            background: 'rgba(255, 255, 255, 0.25)',
+                            color: 'white',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            padding: 0,
+                            cursor: 'pointer',
+                            fontWeight: 'bold',
+                            fontSize: '0.75rem',
+                            lineHeight: 1
+                          }}
+                        >
+                          -
+                        </button>
+                        <button 
+                          onClick={(e) => { e.stopPropagation(); handleIncrement(item.id, person.id); }}
+                          style={{
+                            width: '18px',
+                            height: '18px',
+                            borderRadius: '50%',
+                            border: 'none',
+                            background: 'rgba(255, 255, 255, 0.25)',
+                            color: 'white',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            padding: 0,
+                            cursor: 'pointer',
+                            fontWeight: 'bold',
+                            fontSize: '0.75rem',
+                            lineHeight: 1
+                          }}
+                        >
+                          +
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
               {people.length === 0 && (
                 <span style={{ fontSize: '0.8125rem', color: 'var(--text-muted)', fontStyle: 'italic' }}>
                   Add people to split this item

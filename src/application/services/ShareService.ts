@@ -5,18 +5,30 @@ export class ShareService {
     let text = result.shopName ? `*${result.shopName}*\n` : '';
     text += `*Bill Summary for ${result.personName}*\n`;
     text += `--------------------------\n`;
-    
-    result.items.forEach(item => {
-      text += `• ${item.name}: Rp ${item.splitPrice.toLocaleString()}\n`;
+
+    const groupedItems = result.items.reduce((acc, item) => {
+      const existing = acc.find(i => i.name === item.name);
+      if (existing) {
+        existing.splitPrice += item.splitPrice;
+        existing.quantity += 1;
+      } else {
+        acc.push({ name: item.name, splitPrice: item.splitPrice, quantity: 1 });
+      }
+      return acc;
+    }, [] as { name: string; splitPrice: number; quantity: number }[]);
+
+    groupedItems.forEach(item => {
+      const qtyStr = item.quantity > 1 ? ` (x${item.quantity})` : '';
+      text += `• ${item.name}${qtyStr}: Rp ${item.splitPrice.toLocaleString()}\n`;
     });
-    
+
     text += `--------------------------\n`;
     text += `Subtotal: Rp ${result.subtotal.toLocaleString()}\n`;
-    
+
     if (result.taxAmount > 0 || result.serviceChargeAmount > 0) {
       text += `Tax & Service: Rp ${(result.taxAmount + result.serviceChargeAmount).toLocaleString()}\n`;
     }
-    
+
     if (result.extraChargesAmount > 0) {
       text += `Extra Charges: Rp ${result.extraChargesAmount.toLocaleString()}\n`;
     }
@@ -24,11 +36,11 @@ export class ShareService {
     if (result.discountAmount > 0) {
       text += `Discounts: -Rp ${Math.floor(result.discountAmount).toLocaleString()}\n`;
     }
-    
+
     text += `--------------------------\n`;
     text += `*Total to Pay: Rp ${result.total.toLocaleString()}*\n\n`;
     text += `Shared via Enwari`;
-    
+
     return text;
   }
 
@@ -48,14 +60,14 @@ export class ShareService {
     text += `Grand Total: Rp ${grandTotal.toLocaleString()}\n`;
     if (totalDiscount > 0) text += `Total Discounts: -Rp ${totalDiscount.toLocaleString()}\n`;
     text += `--------------------------\n\n`;
-    
+
     results.forEach(res => {
       text += `*${res.personName}*: Rp ${res.total.toLocaleString()}\n`;
     });
-    
+
     text += `\n--------------------------\n`;
     text += `Shared via Enwari`;
-    
+
     return text;
   }
 

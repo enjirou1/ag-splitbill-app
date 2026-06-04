@@ -123,8 +123,20 @@ export const exportToPDF = (bill: Bill, results: SplitResult[], filename: string
     y += 4;
 
     pdf.setFont('helvetica', 'italic');
-    res.items.forEach(item => {
-      const nameLines = pdf.splitTextToSize(`- ${item.name}`, 45);
+    const groupedItems = res.items.reduce((acc, item) => {
+      const existing = acc.find(i => i.name === item.name);
+      if (existing) {
+        existing.splitPrice += item.splitPrice;
+        existing.quantity += 1;
+      } else {
+        acc.push({ name: item.name, splitPrice: item.splitPrice, quantity: 1 });
+      }
+      return acc;
+    }, [] as { name: string; splitPrice: number; quantity: number }[]);
+
+    groupedItems.forEach(item => {
+      const qtyStr = item.quantity > 1 ? ` (x${item.quantity})` : '';
+      const nameLines = pdf.splitTextToSize(`- ${item.name}${qtyStr}`, 45);
       pdf.text(nameLines, margin + 2, y);
       pdf.text(item.splitPrice.toLocaleString(), width - margin - 2, y, { align: 'right' });
       y += (nameLines.length * 4);

@@ -126,12 +126,27 @@ export default function SplitSummary() {
             {expanded === res.personId && (
               <div style={{ padding: '1.5rem', background: '#fafafa', borderTop: '1px solid var(--border-color)', animation: 'fadeIn 0.3s ease' }}>
                 <div style={{ marginBottom: '1rem' }}>
-                  {res.items.map((item, idx) => (
-                    <div key={idx} className="flex-between" style={{ fontSize: '0.9375rem', padding: '0.5rem 0', borderBottom: '1px dashed #e2e8f0' }}>
-                      <span style={{ color: '#64748b' }}>{item.name}</span>
-                      <span style={{ fontWeight: 600 }}>Rp {item.splitPrice.toLocaleString()}</span>
-                    </div>
-                  ))}
+                  {(() => {
+                    const groupedItems = res.items.reduce((acc, item) => {
+                      const existing = acc.find(i => i.name === item.name);
+                      if (existing) {
+                        existing.splitPrice += item.splitPrice;
+                        existing.quantity += 1;
+                      } else {
+                        acc.push({ name: item.name, splitPrice: item.splitPrice, quantity: 1 });
+                      }
+                      return acc;
+                    }, [] as { name: string; splitPrice: number; quantity: number }[]);
+
+                    return groupedItems.map((item, idx) => (
+                      <div key={idx} className="flex-between" style={{ fontSize: '0.9375rem', padding: '0.5rem 0', borderBottom: '1px dashed #e2e8f0' }}>
+                        <span style={{ color: '#64748b' }}>
+                          {item.name} {item.quantity > 1 ? `(x${item.quantity})` : ''}
+                        </span>
+                        <span style={{ fontWeight: 600 }}>Rp {item.splitPrice.toLocaleString()}</span>
+                      </div>
+                    ));
+                  })()}
                 </div>
 
                 <div style={{ background: 'white', padding: '1rem', borderRadius: 'var(--radius-sm)', border: '1px solid #e2e8f0' }}>
