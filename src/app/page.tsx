@@ -57,8 +57,8 @@ export default function Home() {
   return (
     <main className="container" style={{ position: 'relative' }}>
       <div style={{ position: 'absolute', top: '1.5rem', right: '1.5rem', zIndex: 10, display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
-        <select 
-          value={language} 
+        <select
+          value={language}
           onChange={(e) => setLanguage(e.target.value as any)}
           style={{
             width: 'auto',
@@ -79,8 +79,8 @@ export default function Home() {
           <option value="ja">日本語</option>
         </select>
 
-        <button 
-          onClick={toggleTheme} 
+        <button
+          onClick={toggleTheme}
           className="btn-secondary btn-icon"
           style={{
             borderRadius: '50%',
@@ -130,18 +130,16 @@ export default function Home() {
             <Store size={20} style={{ color: 'var(--primary)', opacity: 0.8, marginRight: '0.75rem' }} />
             <input
               type="text"
+              className="input-unstyled"
               placeholder={t('storeName')}
               value={shopName}
               onChange={(e) => dispatch(updateShopName(e.target.value))}
               style={{
-                border: 'none',
-                padding: 0,
                 fontSize: '1rem',
                 fontWeight: 600,
                 color: 'var(--text-main)',
                 width: '100%',
-                outline: 'none',
-                background: 'transparent'
+                lineHeight: '1.5'
               }}
             />
           </div>
@@ -172,10 +170,10 @@ export default function Home() {
         <p style={{ fontSize: '0.75rem', opacity: 0.8, marginTop: '0.25rem' }}>v{packageInfo.version}</p>
         <p style={{ marginTop: '0.5rem' }}>
           {t('help')}{' '}
-          <a 
-            href="https://wa.me/6287855161565" 
-            target="_blank" 
-            rel="noopener noreferrer" 
+          <a
+            href="https://wa.me/6287855161565"
+            target="_blank"
+            rel="noopener noreferrer"
             style={{ color: 'var(--primary)', fontWeight: 600, textDecoration: 'underline' }}
           >
             {t('contactWa')}

@@ -153,6 +153,21 @@ input:focus, select:focus {
   background: var(--card-bg);
 }
 
+/* Unstyled input for embedded fields */
+.input-unstyled {
+  border: none !important;
+  padding: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  outline: none !important;
+}
+.input-unstyled:focus {
+  border: none !important;
+  box-shadow: none !important;
+  outline: none !important;
+  background: transparent !important;
+}
+
 /* Layout */
 .btn-icon {
   padding: 0.75rem !important;

@@ -74,11 +74,12 @@ export default function ChargesList() {
           <label style={{ fontSize: '0.8125rem', fontWeight: '700', color: 'var(--text-muted)', display: 'block', marginBottom: '0.5rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
             {t('tax')}
           </label>
-          <div className="flex flex-nowrap" style={{ background: 'var(--card-bg)', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-color)', paddingRight: '0.75rem' }}>
+          <div className="flex flex-nowrap" style={{ background: 'var(--card-bg)', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-color)', padding: '0.625rem 0.75rem' }}>
             <input
               type="text"
+              className="input-unstyled"
               value={formatThousand(taxStr)}
-              style={{ border: 'none', background: 'transparent', flex: 1 }}
+              style={{ flex: 1, lineHeight: '1.5' }}
               onChange={(e) => {
                 const parsed = parseThousand(e.target.value);
                 setTaxStr(parsed);
@@ -93,11 +94,12 @@ export default function ChargesList() {
           <label style={{ fontSize: '0.8125rem', fontWeight: '700', color: 'var(--text-muted)', display: 'block', marginBottom: '0.5rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
             {t('serviceCharge')}
           </label>
-          <div className="flex flex-nowrap" style={{ background: 'var(--card-bg)', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-color)', paddingRight: '0.75rem' }}>
+          <div className="flex flex-nowrap" style={{ background: 'var(--card-bg)', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-color)', padding: '0.625rem 0.75rem' }}>
             <input
               type="text"
+              className="input-unstyled"
               value={formatThousand(serviceStr)}
-              style={{ border: 'none', background: 'transparent', flex: 1 }}
+              style={{ flex: 1, lineHeight: '1.5' }}
               onChange={(e) => {
                 const parsed = parseThousand(e.target.value);
                 setServiceStr(parsed);
