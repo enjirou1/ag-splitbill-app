@@ -6,6 +6,7 @@ import { updateTax, updateServiceCharge, addExtraCharge, removeExtraCharge, upda
 import { Percent, Receipt, Plus, Trash2, CheckCircle2, Save } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { formatThousand, parseThousand } from './numberUtils';
+import { useLanguage } from '../context/LanguageContext';
 
 export default function ChargesList() {
   const bill = useSelector((state: RootState) => state.bill);
@@ -13,6 +14,7 @@ export default function ChargesList() {
   const [extraName, setExtraName] = useState('');
   const [extraValue, setExtraValue] = useState('');
   const [extraType, setExtraType] = useState<'percentage' | 'fixed'>('fixed');
+  const { t } = useLanguage();
 
   const [taxStr, setTaxStr] = useState(bill.tax.toString());
   const [serviceStr, setServiceStr] = useState(bill.serviceCharge.toString());
@@ -65,14 +67,14 @@ export default function ChargesList() {
 
   return (
     <div className="card">
-      <h2 className="section-title"><Receipt size={24} /> Taxes & Charges</h2>
+      <h2 className="section-title"><Receipt size={24} /> {t('taxesCharges')}</h2>
 
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1.5rem', marginBottom: '2rem' }}>
-        <div style={{ flex: '1 1 150px', background: '#f8fafc', padding: '1rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)' }}>
+        <div style={{ flex: '1 1 150px', background: 'var(--secondary)', padding: '1rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)' }}>
           <label style={{ fontSize: '0.8125rem', fontWeight: '700', color: 'var(--text-muted)', display: 'block', marginBottom: '0.5rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-            Tax
+            {t('tax')}
           </label>
-          <div className="flex flex-nowrap" style={{ background: 'white', borderRadius: 'var(--radius-sm)', border: '2px solid #eef2ff', paddingRight: '0.75rem' }}>
+          <div className="flex flex-nowrap" style={{ background: 'var(--card-bg)', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-color)', paddingRight: '0.75rem' }}>
             <input
               type="text"
               value={formatThousand(taxStr)}
@@ -87,11 +89,11 @@ export default function ChargesList() {
             <Percent size={18} style={{ color: 'var(--primary)', opacity: 0.5, flexShrink: 0 }} />
           </div>
         </div>
-        <div style={{ flex: '1 1 150px', background: '#f8fafc', padding: '1rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)' }}>
+        <div style={{ flex: '1 1 150px', background: 'var(--secondary)', padding: '1rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)' }}>
           <label style={{ fontSize: '0.8125rem', fontWeight: '700', color: 'var(--text-muted)', display: 'block', marginBottom: '0.5rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-            Service Charge
+            {t('serviceCharge')}
           </label>
-          <div className="flex flex-nowrap" style={{ background: 'white', borderRadius: 'var(--radius-sm)', border: '2px solid #eef2ff', paddingRight: '0.75rem' }}>
+          <div className="flex flex-nowrap" style={{ background: 'var(--card-bg)', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-color)', paddingRight: '0.75rem' }}>
             <input
               type="text"
               value={formatThousand(serviceStr)}
@@ -109,15 +111,15 @@ export default function ChargesList() {
       </div>
 
       <div style={{ paddingTop: '1rem' }}>
-        <h3 style={{ fontSize: '1rem', fontWeight: '700', marginBottom: '1rem', color: '#475569' }}>Extra Charges</h3>
+        <h3 style={{ fontSize: '1rem', fontWeight: '700', marginBottom: '1rem', color: 'var(--text-main)' }}>{t('extraCharges')}</h3>
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.75rem', marginBottom: '1.5rem' }}>
           <div style={{ flex: '2 1 150px' }}>
-            <input type="text" placeholder="e.g. Delivery" value={extraName} onChange={(e) => setExtraName(e.target.value)} />
+            <input type="text" placeholder={t('deliveryPlaceholder')} value={extraName} onChange={(e) => setExtraName(e.target.value)} />
           </div>
            <div style={{ flex: '1 1 80px' }}>
              <input
                type="text"
-               placeholder="Value"
+               placeholder={t('value')}
                value={formatThousand(extraValue)}
                onChange={(e) => setExtraValue(parseThousand(e.target.value))}
                onFocus={(e) => e.target.select()}
@@ -125,8 +127,8 @@ export default function ChargesList() {
            </div>
           <div style={{ flex: '1 1 120px' }}>
             <select value={extraType} onChange={(e) => setExtraType(e.target.value as any)}>
-              <option value="fixed">Fixed (Rp)</option>
-              <option value="percentage">Percent (%)</option>
+              <option value="fixed">{t('fixed')}</option>
+              <option value="percentage">{t('percentage')}</option>
             </select>
           </div>
           <button className="btn-primary btn-icon" onClick={handleAddExtra}>
@@ -136,7 +138,7 @@ export default function ChargesList() {
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
           {bill.extraCharges.map(charge => (
-            <div key={charge.id} className="flex-between" style={{ padding: '0.75rem 1rem', background: 'white', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-color)' }}>
+            <div key={charge.id} className="flex-between" style={{ padding: '0.75rem 1rem', background: 'var(--card-bg)', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-color)' }}>
               {editingId === charge.id ? (
                 <div style={{ display: 'flex', gap: '0.5rem', flex: 1, marginRight: '1rem', alignItems: 'center' }}>
                   <input 
@@ -178,12 +180,13 @@ export default function ChargesList() {
                     <span style={{ fontWeight: 700, color: 'var(--primary)', cursor: 'pointer' }} onClick={() => handleStartEdit(charge)}>
                       {charge.type === 'percentage' ? `${charge.value}%` : `Rp ${charge.value.toLocaleString()}`}
                     </span>
-                    <div
+                    <button
                       onClick={() => dispatch(removeExtraCharge(charge.id))}
-                      style={{ color: 'var(--danger)', cursor: 'pointer', display: 'flex', padding: '4px' }}
+                      className="btn-delete"
+                      title="Hapus Biaya"
                     >
                       <Trash2 size={16} />
-                    </div>
+                    </button>
                   </div>
                 </>
               )}

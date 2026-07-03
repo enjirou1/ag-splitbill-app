@@ -7,6 +7,7 @@ import { addItem, updateItem, removeItem } from '../store/billSlice';
 import { ShoppingBag, Plus, Trash2, CheckCircle2, User, Save } from 'lucide-react';
 import AutofillButton from './AutofillButton';
 import { formatThousand, parseThousand } from './numberUtils';
+import { useLanguage } from '../context/LanguageContext';
 
 export default function ItemList() {
   const [name, setName] = useState('');
@@ -16,6 +17,7 @@ export default function ItemList() {
   const items = useSelector((state: RootState) => state.bill.items);
   const people = useSelector((state: RootState) => state.bill.people);
   const dispatch = useDispatch();
+  const { t } = useLanguage();
 
   const handleAddItem = () => {
     if (name.trim() && price) {
@@ -91,7 +93,7 @@ export default function ItemList() {
   return (
     <div className="card">
       <div className="flex-between" style={{ marginBottom: '1.5rem' }}>
-        <h2 className="section-title" style={{ marginBottom: 0 }}><ShoppingBag size={24} /> Items</h2>
+        <h2 className="section-title" style={{ marginBottom: 0 }}><ShoppingBag size={24} /> {t('items')}</h2>
         <AutofillButton />
       </div>
       
@@ -102,12 +104,12 @@ export default function ItemList() {
         marginBottom: '2rem' 
       }}>
         <div style={{ flex: '2 1 200px' }}>
-          <input type="text" placeholder="Item name" value={name} onChange={(e) => setName(e.target.value)} />
+          <input type="text" placeholder={t('itemName')} value={name} onChange={(e) => setName(e.target.value)} />
         </div>
          <div style={{ flex: '1 1 100px' }}>
            <input 
              type="text" 
-             placeholder="Price" 
+             placeholder={t('price')} 
              value={formatThousand(price)} 
              onChange={(e) => setPrice(parseThousand(e.target.value))} 
              onFocus={(e) => e.target.select()}
@@ -152,7 +154,7 @@ export default function ItemList() {
                   </div>
                 ) : (
                   <div onClick={() => handleStartEdit(item)} style={{ cursor: 'pointer' }}>
-                    <span style={{ fontWeight: 700, fontSize: '1.1rem', color: '#1e293b' }}>{item.name}</span>
+                    <span style={{ fontWeight: 700, fontSize: '1.1rem', color: 'var(--text-main)' }}>{item.name}</span>
                     <span className="badge" style={{ marginLeft: '12px', background: '#fdf2f8', color: '#db2777' }}>x{item.quantity}</span>
                   </div>
                 )}
@@ -183,19 +185,13 @@ export default function ItemList() {
                     Rp {(item.price * item.quantity).toLocaleString()}
                   </span>
                 )}
-                <div 
+                <button 
                   onClick={() => dispatch(removeItem(item.id))}
-                  style={{ 
-                    padding: '6px', 
-                    borderRadius: '8px', 
-                    color: 'var(--danger)', 
-                    cursor: 'pointer',
-                    background: '#fff1f2',
-                    display: 'flex'
-                  }}
+                  className="btn-delete"
+                  title="Hapus Barang"
                 >
                   <Trash2 size={16} />
-                </div>
+                </button>
               </div>
             </div>
             
@@ -296,12 +292,12 @@ export default function ItemList() {
           <div style={{ 
             textAlign: 'center', 
             padding: '3rem 1rem', 
-            background: '#f8fafc', 
+            background: 'var(--secondary)', 
             borderRadius: 'var(--radius-md)',
             border: '1px dashed var(--border-color)'
           }}>
             <ShoppingBag size={40} style={{ opacity: 0.1, marginBottom: '1rem' }} />
-            <p style={{ color: 'var(--text-muted)' }}>No items yet.</p>
+            <p style={{ color: 'var(--text-muted)' }}>{t('noItems')}</p>
           </div>
         )}
       </div>

@@ -3,8 +3,9 @@
 import { useState, useRef } from 'react';
 import { useDispatch } from 'react-redux';
 import { autofillBill } from '../store/billSlice';
-import { Camera, Loader2, Sparkles, Image as ImageIcon } from 'lucide-react';
+import { Camera, Loader2, Image as ImageIcon } from 'lucide-react';
 import CameraModal from './CameraModal';
+import { useLanguage } from '../context/LanguageContext';
 
 export default function AutofillButton() {
   const [loading, setLoading] = useState(false);
@@ -12,6 +13,7 @@ export default function AutofillButton() {
   const [cameraOpen, setCameraOpen] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const dispatch = useDispatch();
+  const { t } = useLanguage();
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -83,21 +85,18 @@ export default function AutofillButton() {
           alignItems: 'center', 
           gap: '0.5rem',
           padding: '0.5rem 1rem',
-          fontSize: '0.875rem',
-          background: 'linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%)',
-          borderColor: '#bae6fd',
-          color: '#0369a1'
+          fontSize: '0.875rem'
         }}
       >
         {loading ? (
           <>
             <Loader2 size={18} className="animate-spin" />
-            Membaca...
+            {t('reading')}
           </>
         ) : (
           <>
-            <Sparkles size={18} style={{ color: '#0ea5e9' }} />
-            AI Scan Nota
+            <Camera size={18} />
+            {t('scanReceipt')}
           </>
         )}
       </button>
@@ -124,7 +123,7 @@ export default function AutofillButton() {
           position: 'absolute',
           right: 0,
           top: 'calc(100% + 6px)',
-          background: 'white',
+          background: 'var(--card-bg)',
           border: '1px solid var(--border-color)',
           borderRadius: 'var(--radius-sm)',
           boxShadow: 'var(--shadow-md)',
@@ -155,7 +154,7 @@ export default function AutofillButton() {
             className="dropdown-item-hover"
           >
             <Camera size={16} style={{ color: 'var(--primary)' }} />
-            Ambil Foto
+            {t('takePhoto')}
           </button>
           
           <button
@@ -179,7 +178,7 @@ export default function AutofillButton() {
             className="dropdown-item-hover"
           >
             <ImageIcon size={16} style={{ color: 'var(--primary)' }} />
-            Pilih dari Galeri
+            {t('chooseGallery')}
           </button>
         </div>
       )}

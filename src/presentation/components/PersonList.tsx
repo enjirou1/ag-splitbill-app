@@ -5,11 +5,13 @@ import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../store';
 import { addPerson, removePerson, updatePerson } from '../store/billSlice';
 import { UserPlus, UserMinus, User, Shuffle, Save } from 'lucide-react';
+import { useLanguage } from '../context/LanguageContext';
 
 export default function PersonList() {
   const [name, setName] = useState('');
   const people = useSelector((state: RootState) => state.bill.people);
   const dispatch = useDispatch();
+  const { t } = useLanguage();
 
   const handleAdd = () => {
     if (name.trim()) {
@@ -41,16 +43,16 @@ export default function PersonList() {
 
   return (
     <div className="card">
-      <h2 className="section-title"><User size={24} /> People</h2>
+      <h2 className="section-title"><User size={24} /> {t('people')}</h2>
       <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem', marginBottom: '1.25rem' }}>
-        Add friends who are sharing the bill.
+        {t('addFriends')}
       </p>
       
       <div className="flex" style={{ marginBottom: '1.5rem' }}>
         <div style={{ position: 'relative', flex: '1 1 200px' }}>
           <input 
             type="text" 
-            placeholder="Enter name..." 
+            placeholder={t('enterName')} 
             value={name} 
             onChange={(e) => setName(e.target.value)}
             onKeyPress={(e) => e.key === 'Enter' && handleAdd()}
@@ -132,7 +134,7 @@ export default function PersonList() {
             color: 'var(--text-muted)'
           }}>
             <User size={32} style={{ opacity: 0.2, marginBottom: '0.5rem' }} />
-            <p>No people added yet.</p>
+            <p>{t('noPeople')}</p>
           </div>
         )}
       </div>

@@ -5,6 +5,7 @@ import { createPortal } from 'react-dom';
 import { useDispatch } from 'react-redux';
 import { autofillBill } from '../store/billSlice';
 import { Camera, Loader2, X, RefreshCw, Check } from 'lucide-react';
+import { useLanguage } from '../context/LanguageContext';
 
 interface CameraModalProps {
   isOpen: boolean;
@@ -15,6 +16,7 @@ export default function CameraModal({ isOpen, onClose }: CameraModalProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const dispatch = useDispatch();
+  const { t } = useLanguage();
 
   const [stream, setStream] = useState<MediaStream | null>(null);
   const [capturedImage, setCapturedImage] = useState<string | null>(null);
@@ -75,7 +77,7 @@ export default function CameraModal({ isOpen, onClose }: CameraModalProps) {
         }
       } catch (fallbackErr: any) {
         setCameraError(
-          'Tidak dapat mengakses kamera. Pastikan Anda telah memberikan izin penggunaan kamera.'
+          t('cameraAccessError')
         );
       }
     }
@@ -315,7 +317,7 @@ export default function CameraModal({ isOpen, onClose }: CameraModalProps) {
                   padding: '4px 10px',
                   borderRadius: '4px'
                 }}>
-                  Posisikan nota di dalam kotak
+                  {t('positionReceipt')}
                 </div>
                 {/* Neon scan line */}
                 <div style={{
@@ -365,8 +367,8 @@ export default function CameraModal({ isOpen, onClose }: CameraModalProps) {
             }}>
               <Loader2 size={40} className="animate-spin" style={{ color: 'var(--primary)' }} />
               <div style={{ textAlign: 'center' }}>
-                <p style={{ fontWeight: 600 }}>Membaca detail nota...</p>
-                <p style={{ fontSize: '0.8rem', color: '#94a3b8', marginTop: '4px' }}>AI sedang menguraikan menu & harga</p>
+                <p style={{ fontWeight: 600 }}>{t('readingReceipt')}</p>
+                <p style={{ fontSize: '0.8rem', color: '#94a3b8', marginTop: '4px' }}>{t('aiParsing')}</p>
               </div>
             </div>
           )}
@@ -421,7 +423,7 @@ export default function CameraModal({ isOpen, onClose }: CameraModalProps) {
                   boxShadow: '0 4px 12px hsla(var(--primary-h), var(--primary-s), var(--primary-l), 0.3)'
                 }}
               >
-                <Camera size={18} /> Ambil Foto
+                <Camera size={18} /> {t('takePhoto')}
               </button>
             </>
           ) : (
@@ -438,7 +440,7 @@ export default function CameraModal({ isOpen, onClose }: CameraModalProps) {
                   flex: 1
                 }}
               >
-                Foto Ulang
+                {t('retake')}
               </button>
               <button
                 onClick={handleUsePhoto}
@@ -456,7 +458,7 @@ export default function CameraModal({ isOpen, onClose }: CameraModalProps) {
                   boxShadow: '0 4px 12px rgba(16, 185, 129, 0.3)'
                 }}
               >
-                <Check size={18} /> Gunakan Foto
+                <Check size={18} /> {t('usePhoto')}
               </button>
             </>
           )}
