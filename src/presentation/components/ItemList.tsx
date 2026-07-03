@@ -6,6 +6,7 @@ import { RootState } from '../store';
 import { addItem, updateItem, removeItem } from '../store/billSlice';
 import { ShoppingBag, Plus, Trash2, CheckCircle2, User, Save } from 'lucide-react';
 import AutofillButton from './AutofillButton';
+import { formatThousand, parseThousand } from './numberUtils';
 
 export default function ItemList() {
   const [name, setName] = useState('');
@@ -103,24 +104,24 @@ export default function ItemList() {
         <div style={{ flex: '2 1 200px' }}>
           <input type="text" placeholder="Item name" value={name} onChange={(e) => setName(e.target.value)} />
         </div>
-        <div style={{ flex: '1 1 100px' }}>
-          <input 
-            type="number" 
-            placeholder="Price" 
-            value={price} 
-            onChange={(e) => setPrice(e.target.value)} 
-            onFocus={(e) => e.target.select()}
-          />
-        </div>
-        <div style={{ flex: '0 1 70px' }}>
-          <input 
-            type="number" 
-            placeholder="Qty" 
-            value={qty} 
-            onChange={(e) => setQty(e.target.value)} 
-            onFocus={(e) => e.target.select()}
-          />
-        </div>
+         <div style={{ flex: '1 1 100px' }}>
+           <input 
+             type="text" 
+             placeholder="Price" 
+             value={formatThousand(price)} 
+             onChange={(e) => setPrice(parseThousand(e.target.value))} 
+             onFocus={(e) => e.target.select()}
+           />
+         </div>
+         <div style={{ flex: '0 1 70px' }}>
+           <input 
+             type="text" 
+             placeholder="Qty" 
+             value={formatThousand(qty)} 
+             onChange={(e) => setQty(parseThousand(e.target.value))} 
+             onFocus={(e) => e.target.select()}
+           />
+         </div>
         <button className="btn-primary btn-icon" onClick={handleAddItem} title="Add Item">
           <Plus size={20} />
         </button>
@@ -142,9 +143,9 @@ export default function ItemList() {
                     />
                     <span style={{ fontSize: '0.9rem', color: 'var(--text-muted)' }}>x</span>
                     <input 
-                      type="number"
-                      value={editFields?.qty} 
-                      onChange={(e) => setEditFields(prev => prev ? {...prev, qty: e.target.value} : null)}
+                      type="text"
+                      value={formatThousand(editFields?.qty || '')} 
+                      onChange={(e) => setEditFields(prev => prev ? {...prev, qty: parseThousand(e.target.value)} : null)}
                       onKeyPress={(e) => e.key === 'Enter' && handleSaveEdit()}
                       style={{ fontSize: '1rem', padding: '4px 8px', width: '65px' }}
                     />
@@ -162,9 +163,9 @@ export default function ItemList() {
                     <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
                       <span style={{ fontWeight: 800, color: 'var(--primary)' }}>Rp</span>
                       <input 
-                        type="number"
-                        value={editFields?.price} 
-                        onChange={(e) => setEditFields(prev => prev ? {...prev, price: e.target.value} : null)}
+                        type="text"
+                        value={formatThousand(editFields?.price || '')} 
+                        onChange={(e) => setEditFields(prev => prev ? {...prev, price: parseThousand(e.target.value)} : null)}
                         onKeyPress={(e) => e.key === 'Enter' && handleSaveEdit()}
                         style={{ fontSize: '1.1rem', fontWeight: 800, padding: '4px 8px', width: '100px', textAlign: 'right', color: 'var(--primary)' }}
                       />

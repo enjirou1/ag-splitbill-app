@@ -65,15 +65,10 @@ body {
   border-radius: var(--radius-md);
   padding: 2rem;
   box-shadow: var(--shadow-md);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
   /* height: 100%; removed to allow content expansion */
   /* overflow: hidden; removed to prevent clipping */
 }
 
-.card:hover {
-  transform: translateY(-4px);
-  box-shadow: var(--shadow-lg);
-}
 
 .title {
   font-size: clamp(2rem, 8vw, 3.5rem); /* Responsive font size */
@@ -289,6 +284,29 @@ input:focus {
   transform: scale(0.95);
 }
 
+/* Inline name editing style overrides */
+input.edit-input-inline {
+  color: white !important;
+  background: transparent !important;
+  border: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  box-shadow: none !important;
+  outline: none !important;
+  font-weight: 600 !important;
+  font-size: inherit !important;
+  font-family: inherit !important;
+  height: auto !important;
+}
+
+input.edit-input-inline:focus {
+  color: white !important;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  outline: none !important;
+}
+
 /* Responsive Customizations */
 @media (max-width: 768px) {
   .container { padding: 1.5rem 1rem; }
@@ -312,4 +330,16 @@ input:focus {
 .logo-img:hover {
   transform: scale(1.05);
 }
+
+/* Hide number input spinners globally to match text inputs */
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+
 

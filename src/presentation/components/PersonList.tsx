@@ -76,14 +76,7 @@ export default function PersonList() {
                   onChange={(e) => setEditName(e.target.value)}
                   onKeyPress={(e) => e.key === 'Enter' && handleSaveEdit()}
                   style={{
-                    background: 'transparent',
-                    border: 'none',
-                    color: 'white',
-                    fontWeight: 600,
-                    width: `${Math.max(editName.length, 4)}ch`,
-                    padding: 0,
-                    margin: 0,
-                    outline: 'none'
+                    width: `${Math.max(editName.length, 4)}ch`
                   }}
                 />
                 <button 
@@ -95,6 +88,7 @@ export default function PersonList() {
                     borderRadius: '50%', 
                     width: '28px', 
                     height: '28px', 
+                    padding: 0,
                     display: 'flex', 
                     alignItems: 'center', 
                     justifyContent: 'center',

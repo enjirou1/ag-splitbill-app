@@ -5,6 +5,7 @@ import { RootState } from '../store';
 import { addDiscount, removeDiscount, updateDiscount } from '../store/billSlice';
 import { Tag, Plus, Trash2, Info, Check, Save } from 'lucide-react';
 import { useState } from 'react';
+import { formatThousand, parseThousand } from './numberUtils';
 
 export default function DiscountsList() {
   const bill = useSelector((state: RootState) => state.bill);
@@ -77,10 +78,15 @@ export default function DiscountsList() {
             <label className="input-label">Voucher Name</label>
             <input type="text" placeholder="e.g. COUPON 50%" value={name} onChange={(e) => setName(e.target.value)} />
           </div>
-          <div style={{ flex: '1 1 100px' }}>
-            <label className="input-label">Value</label>
-            <input type="number" placeholder="Value" value={value} onChange={(e) => setValue(e.target.value)} />
-          </div>
+           <div style={{ flex: '1 1 100px' }}>
+             <label className="input-label">Value</label>
+             <input 
+               type="text" 
+               placeholder="Value" 
+               value={formatThousand(value)} 
+               onChange={(e) => setValue(parseThousand(e.target.value))} 
+             />
+           </div>
           <div style={{ flex: '1 1 120px' }}>
             <label className="input-label">Type</label>
             <select value={type} onChange={(e) => setType(e.target.value as any)}>
@@ -91,16 +97,26 @@ export default function DiscountsList() {
         </div>
 
         <div className="flex" style={{ flexWrap: 'wrap' }}>
-          <div style={{ flex: '1 1 150px' }}>
-            <label className="input-label">Min. Purchase (Optional)</label>
-            <input type="number" placeholder="e.g. 100000" value={minPurchase} onChange={(e) => setMinPurchase(e.target.value)} />
-          </div>
-          {type === 'percentage' && (
-            <div style={{ flex: '1 1 150px' }}>
-              <label className="input-label">Max. Discount (Optional)</label>
-              <input type="number" placeholder="e.g. 200000" value={maxDiscount} onChange={(e) => setMaxDiscount(e.target.value)} />
-            </div>
-          )}
+           <div style={{ flex: '1 1 150px' }}>
+             <label className="input-label">Min. Purchase (Optional)</label>
+             <input 
+               type="text" 
+               placeholder="e.g. 100.000" 
+               value={formatThousand(minPurchase)} 
+               onChange={(e) => setMinPurchase(parseThousand(e.target.value))} 
+             />
+           </div>
+           {type === 'percentage' && (
+             <div style={{ flex: '1 1 150px' }}>
+               <label className="input-label">Max. Discount (Optional)</label>
+               <input 
+                 type="text" 
+                 placeholder="e.g. 200.000" 
+                 value={formatThousand(maxDiscount)} 
+                 onChange={(e) => setMaxDiscount(parseThousand(e.target.value))} 
+               />
+             </div>
+           )}
           <div style={{ alignSelf: 'flex-end' }}>
             <button className="btn-primary" onClick={handleAddDiscount} style={{ height: '48px', width: '100%' }}>
               <Plus size={20} /> Add Discount
@@ -127,13 +143,13 @@ export default function DiscountsList() {
                       placeholder="Name"
                       style={{ flex: 1 }}
                     />
-                    <input
-                      type="number"
-                      value={editFields?.value}
-                      onChange={(e) => setEditFields(prev => prev ? { ...prev, value: e.target.value } : null)}
-                      placeholder="Val"
-                      style={{ width: '80px' }}
-                    />
+                     <input
+                       type="text"
+                       value={formatThousand(editFields?.value || '')}
+                       onChange={(e) => setEditFields(prev => prev ? { ...prev, value: parseThousand(e.target.value) } : null)}
+                       placeholder="Val"
+                       style={{ width: '80px' }}
+                     />
                     <select
                       value={editFields?.type}
                       onChange={(e) => setEditFields(prev => prev ? { ...prev, type: e.target.value as any } : null)}
@@ -144,21 +160,21 @@ export default function DiscountsList() {
                     </select>
                   </div>
                   <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
-                    <input
-                      type="number"
-                      value={editFields?.minPurchase}
-                      onChange={(e) => setEditFields(prev => prev ? { ...prev, minPurchase: e.target.value } : null)}
-                      placeholder="Min Pur"
-                      style={{ flex: 1, fontSize: '0.8rem' }}
-                    />
-                    <input
-                      type="number"
-                      value={editFields?.maxDiscount}
-                      onChange={(e) => setEditFields(prev => prev ? { ...prev, maxDiscount: e.target.value } : null)}
-                      placeholder="Max Disc"
-                      style={{ flex: 1, fontSize: '0.8rem' }}
-                    />
-                    <button className="btn-primary" onClick={handleSaveEdit} style={{ height: '40px', width: '40px', borderRadius: '50%' }}>
+                     <input
+                       type="text"
+                       value={formatThousand(editFields?.minPurchase || '')}
+                       onChange={(e) => setEditFields(prev => prev ? { ...prev, minPurchase: parseThousand(e.target.value) } : null)}
+                       placeholder="Min Pur"
+                       style={{ flex: 1, fontSize: '0.8rem' }}
+                     />
+                     <input
+                       type="text"
+                       value={formatThousand(editFields?.maxDiscount || '')}
+                       onChange={(e) => setEditFields(prev => prev ? { ...prev, maxDiscount: parseThousand(e.target.value) } : null)}
+                       placeholder="Max Disc"
+                       style={{ flex: 1, fontSize: '0.8rem' }}
+                     />
+                    <button className="btn-primary" onClick={handleSaveEdit} style={{ height: '40px', width: '40px', borderRadius: '50%', padding: 0 }}>
                       <Save size={20} />
                     </button>
                   </div>

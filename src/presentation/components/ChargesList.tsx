@@ -4,7 +4,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../store';
 import { updateTax, updateServiceCharge, addExtraCharge, removeExtraCharge, updateExtraCharge } from '../store/billSlice';
 import { Percent, Receipt, Plus, Trash2, CheckCircle2, Save } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { formatThousand, parseThousand } from './numberUtils';
 
 export default function ChargesList() {
   const bill = useSelector((state: RootState) => state.bill);
@@ -12,6 +13,18 @@ export default function ChargesList() {
   const [extraName, setExtraName] = useState('');
   const [extraValue, setExtraValue] = useState('');
   const [extraType, setExtraType] = useState<'percentage' | 'fixed'>('fixed');
+
+  const [taxStr, setTaxStr] = useState(bill.tax.toString());
+  const [serviceStr, setServiceStr] = useState(bill.serviceCharge.toString());
+
+  // Sync with redux store changes (e.g. autofill)
+  useEffect(() => {
+    setTaxStr(bill.tax.toString());
+  }, [bill.tax]);
+
+  useEffect(() => {
+    setServiceStr(bill.serviceCharge.toString());
+  }, [bill.serviceCharge]);
 
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editFields, setEditFields] = useState<{name: string, value: string, type: 'percentage' | 'fixed'} | null>(null);
@@ -61,10 +74,14 @@ export default function ChargesList() {
           </label>
           <div className="flex flex-nowrap" style={{ background: 'white', borderRadius: 'var(--radius-sm)', border: '2px solid #eef2ff', paddingRight: '0.75rem' }}>
             <input
-              type="number"
-              value={bill.tax}
+              type="text"
+              value={formatThousand(taxStr)}
               style={{ border: 'none', background: 'transparent', flex: 1 }}
-              onChange={(e) => dispatch(updateTax(parseFloat(e.target.value) || 0))}
+              onChange={(e) => {
+                const parsed = parseThousand(e.target.value);
+                setTaxStr(parsed);
+                dispatch(updateTax(parseFloat(parsed) || 0));
+              }}
               onFocus={(e) => e.target.select()}
             />
             <Percent size={18} style={{ color: 'var(--primary)', opacity: 0.5, flexShrink: 0 }} />
@@ -76,10 +93,14 @@ export default function ChargesList() {
           </label>
           <div className="flex flex-nowrap" style={{ background: 'white', borderRadius: 'var(--radius-sm)', border: '2px solid #eef2ff', paddingRight: '0.75rem' }}>
             <input
-              type="number"
-              value={bill.serviceCharge}
+              type="text"
+              value={formatThousand(serviceStr)}
               style={{ border: 'none', background: 'transparent', flex: 1 }}
-              onChange={(e) => dispatch(updateServiceCharge(parseFloat(e.target.value) || 0))}
+              onChange={(e) => {
+                const parsed = parseThousand(e.target.value);
+                setServiceStr(parsed);
+                dispatch(updateServiceCharge(parseFloat(parsed) || 0));
+              }}
               onFocus={(e) => e.target.select()}
             />
             <Percent size={18} style={{ color: 'var(--primary)', opacity: 0.5, flexShrink: 0 }} />
@@ -93,15 +114,15 @@ export default function ChargesList() {
           <div style={{ flex: '2 1 150px' }}>
             <input type="text" placeholder="e.g. Delivery" value={extraName} onChange={(e) => setExtraName(e.target.value)} />
           </div>
-          <div style={{ flex: '1 1 80px' }}>
-            <input
-              type="number"
-              placeholder="Value"
-              value={extraValue}
-              onChange={(e) => setExtraValue(e.target.value)}
-              onFocus={(e) => e.target.select()}
-            />
-          </div>
+           <div style={{ flex: '1 1 80px' }}>
+             <input
+               type="text"
+               placeholder="Value"
+               value={formatThousand(extraValue)}
+               onChange={(e) => setExtraValue(parseThousand(e.target.value))}
+               onFocus={(e) => e.target.select()}
+             />
+           </div>
           <div style={{ flex: '1 1 120px' }}>
             <select value={extraType} onChange={(e) => setExtraType(e.target.value as any)}>
               <option value="fixed">Fixed (Rp)</option>
@@ -126,9 +147,9 @@ export default function ChargesList() {
                     style={{ flex: 1 }}
                   />
                   <input 
-                    type="number"
-                    value={editFields?.value} 
-                    onChange={(e) => setEditFields(prev => prev ? {...prev, value: e.target.value} : null)}
+                    type="text"
+                    value={formatThousand(editFields?.value || '')} 
+                    onChange={(e) => setEditFields(prev => prev ? {...prev, value: parseThousand(e.target.value)} : null)}
                     onKeyPress={(e) => e.key === 'Enter' && handleSaveEdit()}
                     style={{ width: '80px' }}
                   />
