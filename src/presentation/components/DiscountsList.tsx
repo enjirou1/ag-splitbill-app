@@ -89,7 +89,7 @@ export default function DiscountsList() {
               onChange={(e) => setValue(parseThousand(e.target.value))}
             />
           </div>
-          <div style={{ flex: '1 1 120px' }}>
+          <div style={{ flex: '1 1 145px' }}>
             <label className="input-label">{t('type')}</label>
             <select value={type} onChange={(e) => setType(e.target.value as any)}>
               <option value="fixed">{t('fixed')}</option>
@@ -157,8 +157,8 @@ export default function DiscountsList() {
                       onChange={(e) => setEditFields(prev => prev ? { ...prev, type: e.target.value as any } : null)}
                       style={{ width: '100px' }}
                     >
-                      <option value="fixed">{t('fixed')}</option>
-                      <option value="percentage">{t('percentage')}</option>
+                      <option value="fixed">Rp</option>
+                      <option value="percentage">%</option>
                     </select>
                   </div>
                   <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>

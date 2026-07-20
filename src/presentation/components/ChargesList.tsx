@@ -127,7 +127,7 @@ export default function ChargesList() {
                onFocus={(e) => e.target.select()}
              />
            </div>
-          <div style={{ flex: '1 1 120px' }}>
+          <div style={{ flex: '1 1 145px' }}>
             <select value={extraType} onChange={(e) => setExtraType(e.target.value as any)}>
               <option value="fixed">{t('fixed')}</option>
               <option value="percentage">{t('percentage')}</option>
