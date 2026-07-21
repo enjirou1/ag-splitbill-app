@@ -8,6 +8,7 @@ import { ShoppingBag, Plus, Trash2, CheckCircle2, User, Save } from 'lucide-reac
 import AutofillButton from './AutofillButton';
 import { formatThousand, parseThousand } from './numberUtils';
 import { useLanguage } from '../context/LanguageContext';
+import { formatMoney, getCurrencySymbol } from '../utils/currencyUtils';
 
 export default function ItemList() {
   const [name, setName] = useState('');
@@ -16,6 +17,7 @@ export default function ItemList() {
   
   const items = useSelector((state: RootState) => state.bill.items);
   const people = useSelector((state: RootState) => state.bill.people);
+  const currency = useSelector((state: RootState) => state.bill.currency || 'IDR');
   const dispatch = useDispatch();
   const { t } = useLanguage();
 
@@ -163,7 +165,7 @@ export default function ItemList() {
                 {editingId === item.id ? (
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                      <span style={{ fontWeight: 800, color: 'var(--primary)' }}>Rp</span>
+                      <span style={{ fontWeight: 800, color: 'var(--primary)' }}>{getCurrencySymbol(currency)}</span>
                       <input 
                         type="text"
                         value={formatThousand(editFields?.price || '')} 
@@ -182,7 +184,7 @@ export default function ItemList() {
                   </div>
                 ) : (
                   <span onClick={() => handleStartEdit(item)} style={{ fontWeight: 800, fontSize: '1.1rem', color: 'var(--primary)', cursor: 'pointer' }}>
-                    Rp {(item.price * item.quantity).toLocaleString()}
+                    {formatMoney(item.price * item.quantity, currency)}
                   </span>
                 )}
                 <button 

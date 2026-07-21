@@ -8,6 +8,7 @@ import { FileDown, Calculator, ChevronDown, ChevronUp, Share2, Send } from 'luci
 import { ShareService } from '@/application/services/ShareService';
 import { useState } from 'react';
 import { useLanguage } from '../context/LanguageContext';
+import { formatMoney } from '../utils/currencyUtils';
 
 export default function SplitSummary() {
   const bill = useSelector((state: RootState) => state.bill);
@@ -67,7 +68,7 @@ export default function SplitSummary() {
           {t('grandTotal')}
         </p>
         <h3 style={{ fontSize: '2.5rem', fontWeight: '800', color: 'var(--text-main)', letterSpacing: '-0.025em' }}>
-          Rp {grandTotal.toLocaleString()}
+          {formatMoney(grandTotal, bill.currency)}
         </h3>
       </div>
 
@@ -108,7 +109,7 @@ export default function SplitSummary() {
                   }}
                   onClick={(e) => {
                     e.stopPropagation();
-                    ShareService.share(`Split for ${res.personName}`, ShareService.formatPersonSummary(res));
+                    ShareService.share(`Split for ${res.personName}`, ShareService.formatPersonSummary(res, bill.currency));
                   }}
                   title="Share breakdown"
                   className="share-btn-hover"
@@ -116,7 +117,7 @@ export default function SplitSummary() {
                   <Send size={16} />
                 </div>
                 <div className="flex" style={{ gap: '1.25rem' }}>
-                  <span style={{ fontWeight: '800', fontSize: '1.1rem', color: 'var(--primary)' }}>Rp {res.total.toLocaleString()}</span>
+                  <span style={{ fontWeight: '800', fontSize: '1.1rem', color: 'var(--primary)' }}>{formatMoney(res.total, bill.currency)}</span>
                   <div style={{ color: 'var(--text-muted)' }}>
                     {expanded === res.personId ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
                   </div>
@@ -144,7 +145,7 @@ export default function SplitSummary() {
                         <span style={{ color: 'var(--text-muted)' }}>
                           {item.name} {item.quantity > 1 ? `(x${item.quantity})` : ''}
                         </span>
-                        <span style={{ fontWeight: 600 }}>Rp {item.splitPrice.toLocaleString()}</span>
+                        <span style={{ fontWeight: 600 }}>{formatMoney(item.splitPrice, bill.currency)}</span>
                       </div>
                     ));
                   })()}
@@ -153,27 +154,27 @@ export default function SplitSummary() {
                 <div style={{ background: 'var(--card-bg)', padding: '1rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-color)' }}>
                   <div className="flex-between" style={{ fontSize: '0.8125rem', color: 'var(--text-muted)', marginBottom: '0.25rem' }}>
                     <span>{t('subtotal')}</span>
-                    <span>Rp {res.subtotal.toLocaleString()}</span>
+                    <span>{formatMoney(res.subtotal, bill.currency)}</span>
                   </div>
                   <div className="flex-between" style={{ fontSize: '0.8125rem', color: 'var(--text-muted)', marginBottom: '0.25rem' }}>
                     <span>{t('taxService')}</span>
-                    <span>Rp {Math.round(res.taxAmount + res.serviceChargeAmount).toLocaleString()}</span>
+                    <span>{formatMoney(res.taxAmount + res.serviceChargeAmount, bill.currency)}</span>
                   </div>
                   {res.discountAmount > 0 && (
                     <div className="flex-between" style={{ fontSize: '0.8125rem', color: 'var(--danger)', marginBottom: '0.25rem' }}>
                       <span>{t('discounts')}</span>
-                      <span>- Rp {Math.floor(res.discountAmount).toLocaleString()}</span>
+                      <span>- {formatMoney(res.discountAmount, bill.currency)}</span>
                     </div>
                   )}
                   {res.extraChargesAmount > 0 && (
                     <div className="flex-between" style={{ fontSize: '0.8125rem', color: 'var(--text-muted)', marginBottom: '0.25rem' }}>
                       <span>{t('extraCharges')}</span>
-                      <span>Rp {res.extraChargesAmount.toLocaleString()}</span>
+                      <span>{formatMoney(res.extraChargesAmount, bill.currency)}</span>
                     </div>
                   )}
                   <div className="flex-between" style={{ fontSize: '0.9375rem', color: 'var(--text-main)', fontWeight: 700, marginTop: '0.5rem', paddingTop: '0.5rem', borderTop: '1px solid #e2e8f0' }}>
                     <span>{t('totalShare')}</span>
-                    <span style={{ color: 'var(--primary)' }}>Rp {res.total.toLocaleString()}</span>
+                    <span style={{ color: 'var(--primary)' }}>{formatMoney(res.total, bill.currency)}</span>
                   </div>
                 </div>
               </div>

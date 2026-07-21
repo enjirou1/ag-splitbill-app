@@ -3,7 +3,7 @@
 import { useState, useRef } from 'react';
 import { useDispatch } from 'react-redux';
 import { autofillBill } from '../store/billSlice';
-import { Camera, Loader2, Image as ImageIcon } from 'lucide-react';
+import { Sparkles, Loader2, Image as ImageIcon, Camera } from 'lucide-react';
 import CameraModal from './CameraModal';
 import { useLanguage } from '../context/LanguageContext';
 
@@ -95,7 +95,7 @@ export default function AutofillButton() {
           </>
         ) : (
           <>
-            <Camera size={18} />
+            <Sparkles size={18} style={{ color: 'var(--primary)' }} />
             {t('scanReceipt')}
           </>
         )}

@@ -1,7 +1,8 @@
 import { Bill, SplitResult } from "@/domain/entities/Bill";
+import { formatMoney } from "@/presentation/utils/currencyUtils";
 
 export class ShareService {
-  static formatPersonSummary(result: SplitResult): string {
+  static formatPersonSummary(result: SplitResult, currencyCode: string = 'IDR'): string {
     let text = result.shopName ? `*${result.shopName}*\n` : '';
     text += `*Bill Summary for ${result.personName}*\n`;
     text += `--------------------------\n`;
@@ -19,32 +20,33 @@ export class ShareService {
 
     groupedItems.forEach(item => {
       const qtyStr = item.quantity > 1 ? ` (x${item.quantity})` : '';
-      text += `• ${item.name}${qtyStr}: Rp ${item.splitPrice.toLocaleString()}\n`;
+      text += `• ${item.name}${qtyStr}: ${formatMoney(item.splitPrice, currencyCode)}\n`;
     });
 
     text += `--------------------------\n`;
-    text += `Subtotal: Rp ${result.subtotal.toLocaleString()}\n`;
+    text += `Subtotal: ${formatMoney(result.subtotal, currencyCode)}\n`;
 
     if (result.taxAmount > 0 || result.serviceChargeAmount > 0) {
-      text += `Tax & Service: Rp ${(result.taxAmount + result.serviceChargeAmount).toLocaleString()}\n`;
+      text += `Tax & Service: ${formatMoney(result.taxAmount + result.serviceChargeAmount, currencyCode)}\n`;
     }
 
     if (result.extraChargesAmount > 0) {
-      text += `Extra Charges: Rp ${result.extraChargesAmount.toLocaleString()}\n`;
+      text += `Extra Charges: ${formatMoney(result.extraChargesAmount, currencyCode)}\n`;
     }
 
     if (result.discountAmount > 0) {
-      text += `Discounts: -Rp ${Math.floor(result.discountAmount).toLocaleString()}\n`;
+      text += `Discounts: -${formatMoney(Math.floor(result.discountAmount), currencyCode)}\n`;
     }
 
     text += `--------------------------\n`;
-    text += `*Total to Pay: Rp ${result.total.toLocaleString()}*\n\n`;
+    text += `*Total to Pay: ${formatMoney(result.total, currencyCode)}*\n\n`;
     text += `Shared via Enwari`;
 
     return text;
   }
 
   static formatGlobalSummary(bill: Bill, results: SplitResult[]): string {
+    const currencyCode = bill.currency || 'IDR';
     const subtotal = bill.items.reduce((acc, item) => acc + (item.price * item.quantity), 0);
     const taxAmount = (subtotal * bill.tax) / 100;
     const serviceChargeAmount = (subtotal * bill.serviceCharge) / 100;
@@ -57,12 +59,12 @@ export class ShareService {
 
     let text = bill.shopName ? `*${bill.shopName}*\n` : '';
     text += `*Enwari Summary*\n`;
-    text += `Grand Total: Rp ${grandTotal.toLocaleString()}\n`;
-    if (totalDiscount > 0) text += `Total Discounts: -Rp ${totalDiscount.toLocaleString()}\n`;
+    text += `Grand Total: ${formatMoney(grandTotal, currencyCode)}\n`;
+    if (totalDiscount > 0) text += `Total Discounts: -${formatMoney(totalDiscount, currencyCode)}\n`;
     text += `--------------------------\n\n`;
 
     results.forEach(res => {
-      text += `*${res.personName}*: Rp ${res.total.toLocaleString()}\n`;
+      text += `*${res.personName}*: ${formatMoney(res.total, currencyCode)}\n`;
     });
 
     text += `\n--------------------------\n`;

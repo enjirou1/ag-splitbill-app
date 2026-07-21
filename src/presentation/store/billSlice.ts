@@ -3,6 +3,7 @@ import { Bill, BillItem, Person, ExtraCharge, Discount } from '@/domain/entities
 
 interface BillState extends Bill {
   shopName: string;
+  currency: string;
   loading: boolean;
   error: string | null;
   persistenceType: 'local' | 'session' | 'none';
@@ -17,6 +18,7 @@ const initialState: BillState = {
   extraCharges: [],
   discounts: [],
   shopName: '',
+  currency: 'IDR',
   loading: false,
   error: null,
   persistenceType: 'local',
@@ -28,6 +30,9 @@ const billSlice = createSlice({
   reducers: {
     updateShopName: (state, action: PayloadAction<string>) => {
       state.shopName = action.payload;
+    },
+    updateCurrency: (state, action: PayloadAction<string>) => {
+      state.currency = action.payload;
     },
     addItem: (state, action: PayloadAction<Omit<BillItem, 'id'>>) => {
       const newItem = { ...action.payload, id: Math.random().toString(36).substr(2, 9) };
@@ -132,7 +137,7 @@ export const {
   updateTax, updateServiceCharge,
   addExtraCharge, removeExtraCharge, updateExtraCharge,
   addDiscount, removeDiscount, updateDiscount,
-  updateShopName,
+  updateShopName, updateCurrency,
   resetBill, setItems, addItems, autofillBill,
   hydrate
 } = billSlice.actions;

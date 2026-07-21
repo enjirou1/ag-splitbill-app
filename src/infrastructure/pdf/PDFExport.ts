@@ -1,5 +1,6 @@
 import jsPDF from 'jspdf';
 import { Bill, SplitResult } from '@/domain/entities/Bill';
+import { formatMoney } from '@/presentation/utils/currencyUtils';
 
 export const exportToPDF = (bill: Bill, results: SplitResult[], filename: string = 'receipt.pdf') => {
   const pdf = new jsPDF({
@@ -105,7 +106,7 @@ export const exportToPDF = (bill: Bill, results: SplitResult[], filename: string
 
   line('=');
   pdf.setFontSize(10);
-  drawRow('GRAND TOTAL:', `Rp ${grandTotal.toLocaleString()}`, true);
+  drawRow('GRAND TOTAL:', formatMoney(grandTotal, bill.currency), true);
   pdf.setFontSize(7);
   y += 2;
 
@@ -119,7 +120,7 @@ export const exportToPDF = (bill: Bill, results: SplitResult[], filename: string
   results.forEach((res) => {
     pdf.setFont('helvetica', 'bold');
     pdf.text(res.personName.toUpperCase(), margin, y);
-    pdf.text(`Rp ${res.total.toLocaleString()}`, width - margin, y, { align: 'right' });
+    pdf.text(formatMoney(res.total, bill.currency), width - margin, y, { align: 'right' });
     y += 4;
 
     pdf.setFont('helvetica', 'italic');

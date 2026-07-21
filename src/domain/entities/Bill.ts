@@ -30,6 +30,7 @@ export interface Discount {
 export interface Bill {
   id: string;
   shopName?: string;
+  currency?: string;
   items: BillItem[];
   people: Person[];
   tax: number; // percentage

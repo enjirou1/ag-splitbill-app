@@ -7,9 +7,11 @@ import { Tag, Plus, Trash2, Info, Check, Save } from 'lucide-react';
 import { useState } from 'react';
 import { formatThousand, parseThousand } from './numberUtils';
 import { useLanguage } from '../context/LanguageContext';
+import { formatMoney, getCurrencySymbol } from '../utils/currencyUtils';
 
 export default function DiscountsList() {
   const bill = useSelector((state: RootState) => state.bill);
+  const currencySymbol = getCurrencySymbol(bill.currency);
   const dispatch = useDispatch();
   const { t } = useLanguage();
 
@@ -92,7 +94,7 @@ export default function DiscountsList() {
           <div style={{ flex: '1 1 145px' }}>
             <label className="input-label">{t('type')}</label>
             <select value={type} onChange={(e) => setType(e.target.value as any)}>
-              <option value="fixed">{t('fixed')}</option>
+              <option value="fixed">{t('fixed')} ({currencySymbol})</option>
               <option value="percentage">{t('percentage')}</option>
             </select>
           </div>
@@ -157,7 +159,7 @@ export default function DiscountsList() {
                       onChange={(e) => setEditFields(prev => prev ? { ...prev, type: e.target.value as any } : null)}
                       style={{ width: '100px' }}
                     >
-                      <option value="fixed">Rp</option>
+                      <option value="fixed">{currencySymbol}</option>
                       <option value="percentage">%</option>
                     </select>
                   </div>
@@ -188,11 +190,11 @@ export default function DiscountsList() {
                     {(discount.minPurchase || discount.maxDiscount) && (
                       <div style={{ display: 'flex', gap: '0.5rem', fontSize: '0.78rem', color: 'var(--text-muted)', flexWrap: 'wrap', alignItems: 'center' }}>
                         {discount.minPurchase && (
-                          <span>Min: Rp {discount.minPurchase.toLocaleString()}</span>
+                          <span>Min: {formatMoney(discount.minPurchase, bill.currency)}</span>
                         )}
                         {discount.minPurchase && discount.maxDiscount && <span style={{ opacity: 0.5 }}>•</span>}
                         {discount.maxDiscount && (
-                          <span>Max: Rp {discount.maxDiscount.toLocaleString()}</span>
+                          <span>Max: {formatMoney(discount.maxDiscount, bill.currency)}</span>
                         )}
                       </div>
                     )}
@@ -202,7 +204,7 @@ export default function DiscountsList() {
                       onClick={() => handleStartEdit(discount)}
                       style={{ fontWeight: 800, fontSize: '1.15rem', color: 'var(--primary)', cursor: 'pointer' }}
                     >
-                      {discount.type === 'percentage' ? `${discount.value}%` : `Rp ${discount.value.toLocaleString()}`}
+                      {discount.type === 'percentage' ? `${discount.value}%` : formatMoney(discount.value, bill.currency)}
                     </span>
                     <button
                       onClick={() => dispatch(removeDiscount(discount.id))}

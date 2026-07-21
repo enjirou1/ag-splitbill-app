@@ -8,16 +8,18 @@ import SplitSummary from '@/presentation/components/SplitSummary';
 
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '@/presentation/store';
-import { resetBill, hydrate, updateShopName } from '@/presentation/store/billSlice';
+import { resetBill, hydrate, updateShopName, updateCurrency } from '@/presentation/store/billSlice';
 import { RotateCcw, Store, Sun, Moon } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { loadState } from '@/application/services/persistence';
 import packageInfo from '../../package.json';
 import { useLanguage } from '@/presentation/context/LanguageContext';
+import { CURRENCIES } from '@/presentation/utils/currencyUtils';
 
 export default function Home() {
   const dispatch = useDispatch();
   const shopName = useSelector((state: RootState) => state.bill.shopName);
+  const currency = useSelector((state: RootState) => state.bill.currency || 'IDR');
 
   const [theme, setTheme] = useState<'light' | 'dark'>('light');
   const [mounted, setMounted] = useState(false);
@@ -57,6 +59,30 @@ export default function Home() {
   return (
     <main className="container" style={{ position: 'relative' }}>
       <div style={{ position: 'absolute', top: '1.5rem', right: '1.5rem', zIndex: 10, display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
+        <select
+          value={currency}
+          onChange={(e) => dispatch(updateCurrency(e.target.value))}
+          style={{
+            width: 'auto',
+            padding: '0.5rem 1.75rem 0.5rem 0.75rem',
+            fontSize: '0.875rem',
+            fontWeight: 600,
+            borderRadius: 'var(--radius-sm)',
+            border: '1px solid var(--border-color)',
+            background: 'var(--card-bg)',
+            color: 'var(--text-main)',
+            cursor: 'pointer',
+            boxShadow: 'var(--shadow-sm)'
+          }}
+          aria-label="Select Currency"
+        >
+          {CURRENCIES.map((c) => (
+            <option key={c.code} value={c.code}>
+              {c.code} ({c.symbol})
+            </option>
+          ))}
+        </select>
+
         <select
           value={language}
           onChange={(e) => setLanguage(e.target.value as any)}

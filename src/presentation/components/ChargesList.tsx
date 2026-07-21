@@ -7,9 +7,11 @@ import { Percent, Receipt, Plus, Trash2, CheckCircle2, Save } from 'lucide-react
 import { useState, useEffect } from 'react';
 import { formatThousand, parseThousand } from './numberUtils';
 import { useLanguage } from '../context/LanguageContext';
+import { formatMoney, getCurrencySymbol } from '../utils/currencyUtils';
 
 export default function ChargesList() {
   const bill = useSelector((state: RootState) => state.bill);
+  const currencySymbol = getCurrencySymbol(bill.currency);
   const dispatch = useDispatch();
   const [extraName, setExtraName] = useState('');
   const [extraValue, setExtraValue] = useState('');
@@ -129,7 +131,7 @@ export default function ChargesList() {
            </div>
           <div style={{ flex: '1 1 145px' }}>
             <select value={extraType} onChange={(e) => setExtraType(e.target.value as any)}>
-              <option value="fixed">{t('fixed')}</option>
+              <option value="fixed">{t('fixed')} ({currencySymbol})</option>
               <option value="percentage">{t('percentage')}</option>
             </select>
           </div>
@@ -162,7 +164,7 @@ export default function ChargesList() {
                     onChange={(e) => setEditFields(prev => prev ? {...prev, type: e.target.value as any} : null)}
                     style={{ width: '100px' }}
                   >
-                    <option value="fixed">Rp</option>
+                    <option value="fixed">{currencySymbol}</option>
                     <option value="percentage">%</option>
                   </select>
                   <button 
@@ -180,7 +182,7 @@ export default function ChargesList() {
                   </span>
                   <div className="flex">
                     <span style={{ fontWeight: 700, color: 'var(--primary)', cursor: 'pointer' }} onClick={() => handleStartEdit(charge)}>
-                      {charge.type === 'percentage' ? `${charge.value}%` : `Rp ${charge.value.toLocaleString()}`}
+                      {charge.type === 'percentage' ? `${charge.value}%` : formatMoney(charge.value, bill.currency)}
                     </span>
                     <button
                       onClick={() => dispatch(removeExtraCharge(charge.id))}
