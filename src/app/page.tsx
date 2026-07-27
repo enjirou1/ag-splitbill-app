@@ -9,7 +9,7 @@ import SplitSummary from '@/presentation/components/SplitSummary';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '@/presentation/store';
 import { resetBill, hydrate, updateShopName, updateCurrency, updateRoundingMode } from '@/presentation/store/billSlice';
-import { RotateCcw, Store, Sun, Moon } from 'lucide-react';
+import { RotateCcw, Store, Sun, Moon, Settings } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { loadState } from '@/application/services/persistence';
 import packageInfo from '../../package.json';
@@ -24,6 +24,7 @@ export default function Home() {
 
   const [theme, setTheme] = useState<'light' | 'dark'>('light');
   const [mounted, setMounted] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
   const { language, setLanguage, t } = useLanguage();
 
   useEffect(() => {
@@ -61,54 +62,6 @@ export default function Home() {
     <main className="container" style={{ position: 'relative' }}>
       <div style={{ position: 'absolute', top: '1.5rem', right: '1.5rem', zIndex: 10, display: 'flex', gap: '0.75rem', alignItems: 'center', flexWrap: 'wrap', justifyContent: 'flex-end', maxWidth: 'calc(100% - 3rem)' }}>
         <select
-          value={currency}
-          onChange={(e) => dispatch(updateCurrency(e.target.value))}
-          style={{
-            width: 'auto',
-            padding: '0.5rem 1.75rem 0.5rem 0.75rem',
-            fontSize: '0.875rem',
-            fontWeight: 600,
-            borderRadius: 'var(--radius-sm)',
-            border: '1px solid var(--border-color)',
-            background: 'var(--card-bg)',
-            color: 'var(--text-main)',
-            cursor: 'pointer',
-            boxShadow: 'var(--shadow-sm)'
-          }}
-          aria-label="Select Currency"
-        >
-          {CURRENCIES.map((c) => (
-            <option key={c.code} value={c.code}>
-              {c.code} ({c.symbol})
-            </option>
-          ))}
-        </select>
-
-        <select
-          value={roundingMode}
-          onChange={(e) => dispatch(updateRoundingMode(e.target.value as any))}
-          style={{
-            width: 'auto',
-            padding: '0.5rem 2rem 0.5rem 1rem',
-            fontSize: '0.875rem',
-            fontWeight: 600,
-            borderRadius: 'var(--radius-sm)',
-            border: '1px solid var(--border-color)',
-            background: 'var(--card-bg)',
-            color: 'var(--text-main)',
-            cursor: 'pointer',
-            boxShadow: 'var(--shadow-sm)'
-          }}
-          aria-label="Select Rounding Mode"
-        >
-          <option value="none">{t('roundNone')}</option>
-          <option value="1">{t('round1')}</option>
-          <option value="10">{t('round10')}</option>
-          <option value="100">{t('round100')}</option>
-          <option value="1000">{t('round1000')}</option>
-        </select>
-
-        <select
           value={language}
           onChange={(e) => setLanguage(e.target.value as any)}
           style={{
@@ -144,8 +97,87 @@ export default function Home() {
           }}
           aria-label="Toggle Dark Mode"
         >
-          {mounted && theme === 'dark' ? <Sun size={18} style={{ color: '#f59e0b' }} /> : <Moon size={18} style={{ color: '#64748b' }} />}
+          {theme === 'light' ? <Moon size={20} /> : <Sun size={20} />}
         </button>
+
+        <div style={{ position: 'relative' }}>
+          <button 
+            onClick={() => setShowSettings(!showSettings)}
+            className="btn-secondary btn-icon"
+            style={{ 
+              borderRadius: '50%',
+              width: '40px',
+              height: '40px',
+              padding: 0,
+              background: 'var(--card-bg)',
+              border: '1px solid var(--border-color)',
+              boxShadow: 'var(--shadow-sm)',
+              color: 'var(--text-main)'
+            }}
+            title="Settings"
+          >
+            <Settings size={20} />
+          </button>
+
+          {showSettings && (
+            <>
+              <div 
+                onClick={() => setShowSettings(false)}
+                style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: 90 }}
+              />
+              <div style={{
+                position: 'absolute',
+                top: '2.75rem',
+                right: 0,
+                background: 'var(--card-bg)',
+                border: '1px solid var(--border-color)',
+                borderRadius: 'var(--radius-md)',
+                padding: '1rem 1.25rem',
+                boxShadow: 'var(--shadow-lg)',
+                width: '240px',
+                zIndex: 100,
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '1rem',
+                animation: 'fadeIn 0.2s ease'
+              }}>
+                <div>
+                  <label style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-muted)', display: 'block', marginBottom: '0.375rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                    {t('currency')}
+                  </label>
+                  <select
+                    value={currency}
+                    onChange={(e) => dispatch(updateCurrency(e.target.value))}
+                    style={{ width: '100%', padding: '0.5rem 2rem 0.5rem 1rem' }}
+                  >
+                    {CURRENCIES.map((c) => (
+                      <option key={c.code} value={c.code}>
+                        {c.code} ({c.symbol})
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-muted)', display: 'block', marginBottom: '0.375rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                    {t('rounding')}
+                  </label>
+                  <select
+                    value={roundingMode}
+                    onChange={(e) => dispatch(updateRoundingMode(e.target.value as any))}
+                    style={{ width: '100%', padding: '0.5rem 2rem 0.5rem 1rem' }}
+                  >
+                    <option value="none">{t('roundNone')}</option>
+                    <option value="1">{t('round1')}</option>
+                    <option value="10">{t('round10')}</option>
+                    <option value="100">{t('round100')}</option>
+                    <option value="1000">{t('round1000')}</option>
+                  </select>
+                </div>
+              </div>
+            </>
+          )}
+        </div>
       </div>
 
       <header style={{ marginBottom: '2.5rem', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
