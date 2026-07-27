@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../store';
 import { addItem, updateItem, removeItem } from '../store/billSlice';
-import { ShoppingBag, Plus, Trash2, CheckCircle2, User, Save } from 'lucide-react';
+import { ShoppingBag, Plus, Trash2, CheckCircle2, User, Save, ChevronDown, ChevronUp } from 'lucide-react';
 import AutofillButton from './AutofillButton';
 import { formatThousand, parseThousand } from './numberUtils';
 import { useLanguage } from '../context/LanguageContext';
@@ -14,6 +14,7 @@ export default function ItemList() {
   const [name, setName] = useState('');
   const [price, setPrice] = useState('');
   const [qty, setQty] = useState('1');
+  const [isCollapsed, setIsCollapsed] = useState(false);
   
   const items = useSelector((state: RootState) => state.bill.items);
   const people = useSelector((state: RootState) => state.bill.people);
@@ -94,10 +95,21 @@ export default function ItemList() {
 
   return (
     <div className="card">
-      <div className="flex-between" style={{ marginBottom: '1.5rem' }}>
-        <h2 className="section-title" style={{ marginBottom: 0 }}><ShoppingBag size={24} /> {t('items')}</h2>
+      <div className="flex-between" style={{ marginBottom: isCollapsed ? '0' : '1.5rem', userSelect: 'none' }}>
+        <div 
+          onClick={() => setIsCollapsed(!isCollapsed)} 
+          style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer' }}
+        >
+          <h2 className="section-title" style={{ marginBottom: 0 }}><ShoppingBag size={24} /> {t('items')}</h2>
+          <div style={{ color: 'var(--text-muted)' }}>
+            {isCollapsed ? <ChevronDown size={20} /> : <ChevronUp size={20} />}
+          </div>
+        </div>
         <AutofillButton />
       </div>
+      
+      {!isCollapsed && (
+        <>
       
       <div style={{ 
         display: 'flex', 
@@ -303,6 +315,8 @@ export default function ItemList() {
           </div>
         )}
       </div>
+      </>
+      )}
     </div>
   );
 }

@@ -27,8 +27,21 @@ export const getCurrencySymbol = (code: string = DEFAULT_CURRENCY): string => {
   return found ? found.symbol : (code || 'Rp');
 };
 
+export const roundValue = (value: number, mode: string = 'none'): number => {
+  if (mode === 'none' || !mode) return value;
+  const factor = parseInt(mode, 10);
+  if (isNaN(factor)) return value;
+  return Math.round(value / factor) * factor;
+};
+
+export const formatNumber = (val: number): string => {
+  return Number(val.toFixed(4)).toLocaleString('en-US', {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 4
+  });
+};
+
 export const formatMoney = (amount: number, currencyCode: string = DEFAULT_CURRENCY): string => {
   const symbol = getCurrencySymbol(currencyCode);
-  const rounded = Math.round(amount);
-  return `${symbol} ${rounded.toLocaleString()}`;
+  return `${symbol} ${formatNumber(amount)}`;
 };

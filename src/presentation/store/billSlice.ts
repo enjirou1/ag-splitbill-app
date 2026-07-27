@@ -4,6 +4,7 @@ import { Bill, BillItem, Person, ExtraCharge, Discount } from '@/domain/entities
 interface BillState extends Bill {
   shopName: string;
   currency: string;
+  roundingMode: 'none' | '1' | '10' | '100' | '1000';
   loading: boolean;
   error: string | null;
   persistenceType: 'local' | 'session' | 'none';
@@ -19,6 +20,7 @@ const initialState: BillState = {
   discounts: [],
   shopName: '',
   currency: 'IDR',
+  roundingMode: 'none',
   loading: false,
   error: null,
   persistenceType: 'local',
@@ -33,6 +35,9 @@ const billSlice = createSlice({
     },
     updateCurrency: (state, action: PayloadAction<string>) => {
       state.currency = action.payload;
+    },
+    updateRoundingMode: (state, action: PayloadAction<BillState['roundingMode']>) => {
+      state.roundingMode = action.payload;
     },
     addItem: (state, action: PayloadAction<Omit<BillItem, 'id'>>) => {
       const newItem = { ...action.payload, id: Math.random().toString(36).substr(2, 9) };
@@ -137,7 +142,7 @@ export const {
   updateTax, updateServiceCharge,
   addExtraCharge, removeExtraCharge, updateExtraCharge,
   addDiscount, removeDiscount, updateDiscount,
-  updateShopName, updateCurrency,
+  updateShopName, updateCurrency, updateRoundingMode,
   resetBill, setItems, addItems, autofillBill,
   hydrate
 } = billSlice.actions;

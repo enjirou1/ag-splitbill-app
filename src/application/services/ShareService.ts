@@ -1,5 +1,5 @@
 import { Bill, SplitResult } from "@/domain/entities/Bill";
-import { formatMoney } from "@/presentation/utils/currencyUtils";
+import { formatMoney, roundValue } from "@/presentation/utils/currencyUtils";
 
 export class ShareService {
   static formatPersonSummary(result: SplitResult, currencyCode: string = 'IDR'): string {
@@ -35,7 +35,7 @@ export class ShareService {
     }
 
     if (result.discountAmount > 0) {
-      text += `Discounts: -${formatMoney(Math.floor(result.discountAmount), currencyCode)}\n`;
+      text += `Discounts: -${formatMoney(result.discountAmount, currencyCode)}\n`;
     }
 
     text += `--------------------------\n`;
@@ -55,7 +55,7 @@ export class ShareService {
       return acc + charge.value;
     }, 0);
     const totalDiscount = results.reduce((acc, res) => acc + res.discountAmount, 0);
-    const grandTotal = subtotal + taxAmount + serviceChargeAmount + extraChargesAmount - totalDiscount;
+    const grandTotal = roundValue(subtotal + taxAmount + serviceChargeAmount + extraChargesAmount - totalDiscount, bill.roundingMode);
 
     let text = bill.shopName ? `*${bill.shopName}*\n` : '';
     text += `*Enwari Summary*\n`;

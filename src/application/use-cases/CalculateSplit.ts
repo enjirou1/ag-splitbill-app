@@ -1,4 +1,5 @@
 import { Bill, SplitResult } from "@/domain/entities/Bill";
+import { roundValue } from "@/presentation/utils/currencyUtils";
 
 export const calculateSplit = (bill: Bill): SplitResult[] => {
   const results: Record<string, SplitResult> = {};
@@ -41,40 +42,51 @@ export const calculateSplit = (bill: Bill): SplitResult[] => {
 
   const totalSubtotal = Object.values(results).reduce((acc, curr) => acc + curr.subtotal, 0);
 
-  // Calculate total discounts
-  let totalDiscountAmount = 0;
-  bill.discounts.forEach(discount => {
-    if (!discount.minPurchase || totalSubtotal >= discount.minPurchase) {
-      let amount = 0;
-      if (discount.type === 'fixed') {
-        amount = discount.value;
-      } else {
-        amount = (totalSubtotal * discount.value) / 100;
-        if (discount.maxDiscount) {
-          amount = Math.min(amount, discount.maxDiscount);
-        }
-      }
-      totalDiscountAmount += amount;
-    }
-  });
-
-  // Apply tax, service charge, extra charges, and discounts proportionally
+  // Apply tax, service charge, extra charges, and discounts
   Object.values(results).forEach((res) => {
     const ratio = totalSubtotal > 0 ? res.subtotal / totalSubtotal : 0;
 
-    res.discountAmount = totalDiscountAmount * ratio;
-    res.taxAmount = Math.round((res.subtotal * bill.tax) / 100);
-    res.serviceChargeAmount = Math.round((res.subtotal * bill.serviceCharge) / 100);
+    // Calculate discount for this person
+    let personDiscount = 0;
+    bill.discounts.forEach((discount) => {
+      if (!discount.minPurchase || totalSubtotal >= discount.minPurchase) {
+        if (discount.type === 'percentage') {
+          let discountVal = (totalSubtotal * discount.value) / 100;
+          if (discount.maxDiscount) {
+            discountVal = Math.min(discountVal, discount.maxDiscount);
+          }
+          personDiscount += discountVal * ratio;
+        } else {
+          // Fixed discount
+          if (discount.splitMode === 'equal') {
+            const peopleCount = bill.people.length;
+            personDiscount += peopleCount > 0 ? discount.value / peopleCount : 0;
+          } else {
+            // default is proportional
+            personDiscount += discount.value * ratio;
+          }
+        }
+      }
+    });
+    res.discountAmount = personDiscount;
+
+    res.taxAmount = (res.subtotal * bill.tax) / 100;
+    res.serviceChargeAmount = (res.subtotal * bill.serviceCharge) / 100;
     
     res.extraChargesAmount = bill.extraCharges.reduce((acc, charge) => {
       if (charge.type === 'percentage') {
-        return acc + Math.round((res.subtotal * charge.value) / 100);
+        return acc + (res.subtotal * charge.value) / 100;
       } else {
-        return acc + Math.round(charge.value * ratio);
+        if (charge.splitMode === 'equal') {
+          const peopleCount = bill.people.length;
+          return acc + (peopleCount > 0 ? charge.value / peopleCount : 0);
+        } else {
+          return acc + charge.value * ratio;
+        }
       }
     }, 0);
 
-    res.total = Math.ceil(res.subtotal - res.discountAmount + res.taxAmount + res.serviceChargeAmount + res.extraChargesAmount);
+    res.total = roundValue(res.subtotal - res.discountAmount + res.taxAmount + res.serviceChargeAmount + res.extraChargesAmount, bill.roundingMode);
   });
 
   return Object.values(results);

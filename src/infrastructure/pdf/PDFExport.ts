@@ -1,6 +1,6 @@
 import jsPDF from 'jspdf';
 import { Bill, SplitResult } from '@/domain/entities/Bill';
-import { formatMoney } from '@/presentation/utils/currencyUtils';
+import { formatMoney, formatNumber, roundValue } from '@/presentation/utils/currencyUtils';
 
 export const exportToPDF = (bill: Bill, results: SplitResult[], filename: string = 'receipt.pdf') => {
   const pdf = new jsPDF({
@@ -43,8 +43,8 @@ export const exportToPDF = (bill: Bill, results: SplitResult[], filename: string
   pdf.setFontSize(7);
   bill.items.forEach((item) => {
     const nameLines = pdf.splitTextToSize(item.name, 45);
-    const priceInfo = `${item.quantity}x ${item.price.toLocaleString()}`;
-    const total = (item.price * item.quantity).toLocaleString();
+    const priceInfo = `${item.quantity}x ${formatNumber(item.price)}`;
+    const total = formatNumber(item.price * item.quantity);
     
     pdf.text(nameLines, margin, y);
     pdf.text(total, width - margin, y, { align: 'right' });
@@ -71,7 +71,7 @@ export const exportToPDF = (bill: Bill, results: SplitResult[], filename: string
   }, 0);
 
   const totalDiscount = results.reduce((acc, res) => acc + res.discountAmount, 0);
-  const grandTotal = subtotal + taxAmount + serviceChargeAmount + extraChargesAmount - totalDiscount;
+  const grandTotal = roundValue(subtotal + taxAmount + serviceChargeAmount + extraChargesAmount - totalDiscount, bill.roundingMode);
 
   const drawRow = (label: string, value: string, isBold: boolean = false) => {
     pdf.setFont('helvetica', isBold ? 'bold' : 'normal');
@@ -81,13 +81,13 @@ export const exportToPDF = (bill: Bill, results: SplitResult[], filename: string
     y += Math.max(labelLines.length * 4, 5);
   };
 
-  drawRow('Subtotal:', subtotal.toLocaleString());
-  if (taxAmount > 0) drawRow(`Tax (${bill.tax}%):`, taxAmount.toLocaleString());
-  if (serviceChargeAmount > 0) drawRow(`Service (${bill.serviceCharge}%):`, serviceChargeAmount.toLocaleString());
+  drawRow('Subtotal:', formatNumber(subtotal));
+  if (taxAmount > 0) drawRow(`Tax (${bill.tax}%):`, formatNumber(taxAmount));
+  if (serviceChargeAmount > 0) drawRow(`Service (${bill.serviceCharge}%):`, formatNumber(serviceChargeAmount));
   
   bill.extraCharges.forEach(charge => {
     const label = charge.name + (charge.type === 'percentage' ? ` (${charge.value}%):` : ':');
-    const val = (charge.type === 'percentage' ? (subtotal * charge.value) / 100 : charge.value).toLocaleString();
+    const val = formatNumber(charge.type === 'percentage' ? (subtotal * charge.value) / 100 : charge.value);
     drawRow(label, val);
   });
 
@@ -100,7 +100,7 @@ export const exportToPDF = (bill: Bill, results: SplitResult[], filename: string
         amount = (subtotal * discount.value) / 100;
         if (discount.maxDiscount) amount = Math.min(amount, discount.maxDiscount);
       }
-      drawRow(`Discount (${discount.name}):`, `- ${amount.toLocaleString()}`);
+      drawRow(`Discount (${discount.name}):`, `- ${formatNumber(amount)}`);
     }
   });
 
@@ -139,20 +139,20 @@ export const exportToPDF = (bill: Bill, results: SplitResult[], filename: string
       const qtyStr = item.quantity > 1 ? ` (x${item.quantity})` : '';
       const nameLines = pdf.splitTextToSize(`- ${item.name}${qtyStr}`, 45);
       pdf.text(nameLines, margin + 2, y);
-      pdf.text(item.splitPrice.toLocaleString(), width - margin - 2, y, { align: 'right' });
+      pdf.text(formatNumber(item.splitPrice), width - margin - 2, y, { align: 'right' });
       y += (nameLines.length * 4);
     });
 
     const otherCharges = res.taxAmount + res.serviceChargeAmount + res.extraChargesAmount;
     if (otherCharges > 0) {
       pdf.text(`- Taxes & Extra`, margin + 2, y);
-      pdf.text(otherCharges.toLocaleString(), width - margin - 2, y, { align: 'right' });
+      pdf.text(formatNumber(otherCharges), width - margin - 2, y, { align: 'right' });
       y += 4;
     }
 
     if (res.discountAmount > 0) {
       pdf.text(`- Discounts`, margin + 2, y);
-      pdf.text(`- ${Math.floor(res.discountAmount).toLocaleString()}`, width - margin - 2, y, { align: 'right' });
+      pdf.text(`- ${formatNumber(res.discountAmount)}`, width - margin - 2, y, { align: 'right' });
       y += 4;
     }
     

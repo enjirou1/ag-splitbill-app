@@ -15,6 +15,7 @@ export default function SplitSummary() {
   const results = calculateSplit(bill);
   const [expanded, setExpanded] = useState<string | null>(null);
   const { t } = useLanguage();
+  const [isCollapsed, setIsCollapsed] = useState(false);
 
   const subtotal = bill.items.reduce((acc, item) => acc + (item.price * item.quantity), 0);
   const taxAmount = (subtotal * bill.tax) / 100;
@@ -44,8 +45,16 @@ export default function SplitSummary() {
 
   return (
     <div className="card" id="pdf-content">
-      <div className="flex-between" style={{ marginBottom: '2rem' }}>
-        <h2 className="section-title"><Calculator size={24} /> {t('splitSummary')}</h2>
+      <div className="flex-between" style={{ marginBottom: isCollapsed ? '0' : '2rem', userSelect: 'none' }}>
+        <div 
+          onClick={() => setIsCollapsed(!isCollapsed)} 
+          style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer' }}
+        >
+          <h2 className="section-title" style={{ marginBottom: 0 }}><Calculator size={24} /> {t('splitSummary')}</h2>
+          <div style={{ color: 'var(--text-muted)' }}>
+            {isCollapsed ? <ChevronDown size={20} /> : <ChevronUp size={20} />}
+          </div>
+        </div>
         <div className="flex" style={{ gap: '0.5rem', flex: '1 1 auto', justifyContent: 'flex-end' }}>
           <button className="btn-secondary" style={{ flex: '1 1 auto' }} onClick={() => ShareService.share('Enwari Summary', ShareService.formatGlobalSummary(bill, results))}>
             <Share2 size={18} /> <span className="hide-mobile">{t('share')}</span>
@@ -56,132 +65,136 @@ export default function SplitSummary() {
         </div>
       </div>
 
-      <div style={{
-        padding: '1.5rem',
-        borderRadius: 'var(--radius-md)',
-        marginBottom: '2rem',
-        textAlign: 'center',
-        border: '1px solid var(--border-color)',
-        boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.02)'
-      }} className="summary-total-card">
-        <p style={{ color: 'var(--text-muted)', fontSize: '0.8125rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '0.5rem' }}>
-          {t('grandTotal')}
-        </p>
-        <h3 style={{ fontSize: '2.5rem', fontWeight: '800', color: 'var(--text-main)', letterSpacing: '-0.025em' }}>
-          {formatMoney(grandTotal, bill.currency)}
-        </h3>
-      </div>
-
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-        {results.map((res) => (
-          <div key={res.personId} style={{
-            border: '1px solid var(--border-color)',
+      {!isCollapsed && (
+        <>
+          <div style={{
+            padding: '1.5rem',
             borderRadius: 'var(--radius-md)',
-            overflow: 'hidden',
-            background: 'var(--card-bg)',
-            transition: 'all 0.3s ease'
-          }}>
-            <div
-              className="flex-between"
-              style={{
-                padding: '1.25rem',
-                background: expanded === res.personId ? 'var(--secondary)' : 'var(--card-bg)',
-                cursor: 'pointer',
-                borderLeft: expanded === res.personId ? '4px solid var(--primary)' : '4px solid transparent'
-              }}
-              onClick={() => setExpanded(expanded === res.personId ? null : res.personId)}
-            >
-              <div>
-                <span style={{ fontWeight: '700', fontSize: '1.1rem', color: 'var(--text-main)' }}>{res.personName}</span>
-                <p style={{ fontSize: '0.8125rem', color: 'var(--text-muted)' }}>{res.items.length} {t('itemsSelected')}</p>
-              </div>
-              <div className="flex" style={{ gap: '1rem' }}>
-                <div
-                  style={{
-                    color: 'var(--primary)',
-                    padding: '0.5rem',
-                    borderRadius: '50%',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    background: 'rgba(59, 130, 246, 0.1)',
-                    transition: 'all 0.2s ease'
-                  }}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    ShareService.share(`Split for ${res.personName}`, ShareService.formatPersonSummary(res, bill.currency));
-                  }}
-                  title="Share breakdown"
-                  className="share-btn-hover"
-                >
-                  <Send size={16} />
-                </div>
-                <div className="flex" style={{ gap: '1.25rem' }}>
-                  <span style={{ fontWeight: '800', fontSize: '1.1rem', color: 'var(--primary)' }}>{formatMoney(res.total, bill.currency)}</span>
-                  <div style={{ color: 'var(--text-muted)' }}>
-                    {expanded === res.personId ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {expanded === res.personId && (
-              <div style={{ padding: '1.5rem', background: 'var(--bg-color)', borderTop: '1px solid var(--border-color)', animation: 'fadeIn 0.3s ease' }}>
-                <div style={{ marginBottom: '1rem' }}>
-                  {(() => {
-                    const groupedItems = res.items.reduce((acc, item) => {
-                      const existing = acc.find(i => i.name === item.name);
-                      if (existing) {
-                        existing.splitPrice += item.splitPrice;
-                        existing.quantity += 1;
-                      } else {
-                        acc.push({ name: item.name, splitPrice: item.splitPrice, quantity: 1 });
-                      }
-                      return acc;
-                    }, [] as { name: string; splitPrice: number; quantity: number }[]);
-
-                    return groupedItems.map((item, idx) => (
-                      <div key={idx} className="flex-between" style={{ fontSize: '0.9375rem', padding: '0.5rem 0', borderBottom: '1px dashed var(--border-color)' }}>
-                        <span style={{ color: 'var(--text-muted)' }}>
-                          {item.name} {item.quantity > 1 ? `(x${item.quantity})` : ''}
-                        </span>
-                        <span style={{ fontWeight: 600 }}>{formatMoney(item.splitPrice, bill.currency)}</span>
-                      </div>
-                    ));
-                  })()}
-                </div>
-
-                <div style={{ background: 'var(--card-bg)', padding: '1rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-color)' }}>
-                  <div className="flex-between" style={{ fontSize: '0.8125rem', color: 'var(--text-muted)', marginBottom: '0.25rem' }}>
-                    <span>{t('subtotal')}</span>
-                    <span>{formatMoney(res.subtotal, bill.currency)}</span>
-                  </div>
-                  <div className="flex-between" style={{ fontSize: '0.8125rem', color: 'var(--text-muted)', marginBottom: '0.25rem' }}>
-                    <span>{t('taxService')}</span>
-                    <span>{formatMoney(res.taxAmount + res.serviceChargeAmount, bill.currency)}</span>
-                  </div>
-                  {res.discountAmount > 0 && (
-                    <div className="flex-between" style={{ fontSize: '0.8125rem', color: 'var(--danger)', marginBottom: '0.25rem' }}>
-                      <span>{t('discounts')}</span>
-                      <span>- {formatMoney(res.discountAmount, bill.currency)}</span>
-                    </div>
-                  )}
-                  {res.extraChargesAmount > 0 && (
-                    <div className="flex-between" style={{ fontSize: '0.8125rem', color: 'var(--text-muted)', marginBottom: '0.25rem' }}>
-                      <span>{t('extraCharges')}</span>
-                      <span>{formatMoney(res.extraChargesAmount, bill.currency)}</span>
-                    </div>
-                  )}
-                  <div className="flex-between" style={{ fontSize: '0.9375rem', color: 'var(--text-main)', fontWeight: 700, marginTop: '0.5rem', paddingTop: '0.5rem', borderTop: '1px solid #e2e8f0' }}>
-                    <span>{t('totalShare')}</span>
-                    <span style={{ color: 'var(--primary)' }}>{formatMoney(res.total, bill.currency)}</span>
-                  </div>
-                </div>
-              </div>
-            )}
+            marginBottom: '2rem',
+            textAlign: 'center',
+            border: '1px solid var(--border-color)',
+            boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.02)'
+          }} className="summary-total-card">
+            <p style={{ color: 'var(--text-muted)', fontSize: '0.8125rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '0.5rem' }}>
+              {t('grandTotal')}
+            </p>
+            <h3 style={{ fontSize: '2.5rem', fontWeight: '800', color: 'var(--text-main)', letterSpacing: '-0.025em' }}>
+              {formatMoney(grandTotal, bill.currency)}
+            </h3>
           </div>
-        ))}
-      </div>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+            {results.map((res) => (
+              <div key={res.personId} style={{
+                border: '1px solid var(--border-color)',
+                borderRadius: 'var(--radius-md)',
+                overflow: 'hidden',
+                background: 'var(--card-bg)',
+                transition: 'all 0.3s ease'
+              }}>
+                <div
+                  className="flex-between"
+                  style={{
+                    padding: '1.25rem',
+                    background: expanded === res.personId ? 'var(--secondary)' : 'var(--card-bg)',
+                    cursor: 'pointer',
+                    borderLeft: expanded === res.personId ? '4px solid var(--primary)' : '4px solid transparent'
+                  }}
+                  onClick={() => setExpanded(expanded === res.personId ? null : res.personId)}
+                >
+                  <div>
+                    <span style={{ fontWeight: '700', fontSize: '1.1rem', color: 'var(--text-main)' }}>{res.personName}</span>
+                    <p style={{ fontSize: '0.8125rem', color: 'var(--text-muted)' }}>{res.items.length} {t('itemsSelected')}</p>
+                  </div>
+                  <div className="flex" style={{ gap: '1rem' }}>
+                    <div
+                      style={{
+                        color: 'var(--primary)',
+                        padding: '0.5rem',
+                        borderRadius: '50%',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        background: 'rgba(59, 130, 246, 0.1)',
+                        transition: 'all 0.2s ease'
+                      }}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        ShareService.share(`Split for ${res.personName}`, ShareService.formatPersonSummary(res, bill.currency));
+                      }}
+                      title="Share breakdown"
+                      className="share-btn-hover"
+                    >
+                      <Send size={16} />
+                    </div>
+                    <div className="flex" style={{ gap: '1.25rem' }}>
+                      <span style={{ fontWeight: '800', fontSize: '1.1rem', color: 'var(--primary)' }}>{formatMoney(res.total, bill.currency)}</span>
+                      <div style={{ color: 'var(--text-muted)' }}>
+                        {expanded === res.personId ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {expanded === res.personId && (
+                  <div style={{ padding: '1.5rem', background: 'var(--bg-color)', borderTop: '1px solid var(--border-color)', animation: 'fadeIn 0.3s ease' }}>
+                    <div style={{ marginBottom: '1rem' }}>
+                      {(() => {
+                        const groupedItems = res.items.reduce((acc, item) => {
+                          const existing = acc.find(i => i.name === item.name);
+                          if (existing) {
+                            existing.splitPrice += item.splitPrice;
+                            existing.quantity += 1;
+                          } else {
+                            acc.push({ name: item.name, splitPrice: item.splitPrice, quantity: 1 });
+                          }
+                          return acc;
+                        }, [] as { name: string; splitPrice: number; quantity: number }[]);
+
+                        return groupedItems.map((item, idx) => (
+                          <div key={idx} className="flex-between" style={{ fontSize: '0.9375rem', padding: '0.5rem 0', borderBottom: '1px dashed var(--border-color)' }}>
+                            <span style={{ color: 'var(--text-muted)' }}>
+                              {item.name} {item.quantity > 1 ? `(x${item.quantity})` : ''}
+                            </span>
+                            <span style={{ fontWeight: 600 }}>{formatMoney(item.splitPrice, bill.currency)}</span>
+                          </div>
+                        ));
+                      })()}
+                    </div>
+
+                    <div style={{ background: 'var(--card-bg)', padding: '1rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-color)' }}>
+                      <div className="flex-between" style={{ fontSize: '0.8125rem', color: 'var(--text-muted)', marginBottom: '0.25rem' }}>
+                        <span>{t('subtotal')}</span>
+                        <span>{formatMoney(res.subtotal, bill.currency)}</span>
+                      </div>
+                      <div className="flex-between" style={{ fontSize: '0.8125rem', color: 'var(--text-muted)', marginBottom: '0.25rem' }}>
+                        <span>{t('taxService')}</span>
+                        <span>{formatMoney(res.taxAmount + res.serviceChargeAmount, bill.currency)}</span>
+                      </div>
+                      {res.discountAmount > 0 && (
+                        <div className="flex-between" style={{ fontSize: '0.8125rem', color: 'var(--danger)', marginBottom: '0.25rem' }}>
+                          <span>{t('discounts')}</span>
+                          <span>- {formatMoney(res.discountAmount, bill.currency)}</span>
+                        </div>
+                      )}
+                      {res.extraChargesAmount > 0 && (
+                        <div className="flex-between" style={{ fontSize: '0.8125rem', color: 'var(--text-muted)', marginBottom: '0.25rem' }}>
+                          <span>{t('extraCharges')}</span>
+                          <span>{formatMoney(res.extraChargesAmount, bill.currency)}</span>
+                        </div>
+                      )}
+                      <div className="flex-between" style={{ fontSize: '0.9375rem', color: 'var(--text-main)', fontWeight: 700, marginTop: '0.5rem', paddingTop: '0.5rem', borderTop: '1px solid #e2e8f0' }}>
+                        <span>{t('totalShare')}</span>
+                        <span style={{ color: 'var(--primary)' }}>{formatMoney(res.total, bill.currency)}</span>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </>
+      )}
     </div>
   );
 }

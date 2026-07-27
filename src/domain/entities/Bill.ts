@@ -16,6 +16,7 @@ export interface ExtraCharge {
   name: string;
   value: number;
   type: 'percentage' | 'fixed';
+  splitMode?: 'proportional' | 'equal';
 }
 
 export interface Discount {
@@ -25,12 +26,14 @@ export interface Discount {
   value: number;
   minPurchase?: number;
   maxDiscount?: number;
+  splitMode?: 'proportional' | 'equal';
 }
 
 export interface Bill {
   id: string;
   shopName?: string;
   currency?: string;
+  roundingMode?: 'none' | '1' | '10' | '100' | '1000';
   items: BillItem[];
   people: Person[];
   tax: number; // percentage
